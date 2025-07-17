@@ -1,5 +1,7 @@
 .. crispy documentation master file
 
+.. _index:
+
 Welcome to Crispy's documentation!
 ==================================
 

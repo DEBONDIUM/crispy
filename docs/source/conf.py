@@ -15,6 +15,9 @@ copyright = '2025, L. Brémaud, J. Girardot'
 author = 'L. Brémaud, J. Girardot'
 release = '0.1'
 
+html_logo = "_static/logoII.png"
+#html_favicon = "_static/favicon.ico"
+
 # -- General configuration ---------------------------------------------------
 # https://www.sphinx-doc.org/en/master/usage/configuration.html#general-configuration
 
@@ -25,6 +28,8 @@ extensions = [
    'sphinx.ext.autosummary',
    'sphinx.ext.napoleon',
    'sphinx.ext.viewcode',
+   "sphinx.ext.intersphinx",
+   'sphinx.ext.githubpages',
 ]
 
 templates_path = ['_templates']
@@ -36,6 +41,24 @@ exclude_patterns = []
 
 html_theme = 'sphinx_rtd_theme'
 html_static_path = ['_static']
+html_css_files = [
+    'custom.css',
+]
 
 autoclass_content = 'both'
 autodoc_member_order = 'bysource'
+
+html_theme_options = {
+    'collapse_navigation': True,
+    'navigation_depth': 3,
+    'titles_only': False
+}
+
+pygments_style = 'sphinx'  # Options: 'default', 'sphinx', 'friendly', 'monokai', etc.
+
+intersphinx_mapping = {
+    'python': ('https://docs.python.org/3', None),
+    'numpy': ('https://numpy.org/doc/stable/', None),
+}
+
+

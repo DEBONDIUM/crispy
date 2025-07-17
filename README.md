@@ -1,15 +1,15 @@
-# crispy
-# 🧩 crispy – Fragmentation Analysis in Solid Mechanics
+# Crispy
+# 🧩 Crispy – Fragmentation Analysis in Solid Mechanics
 
-**crispy** is a lightweight Python library designed to **identify, count, and analyze fragments** generated in **solid mechanics simulations**. Whether you're working on dynamic fracture, debris tracking, or material rupture, `crispy` provides simple and robust tools to extract meaningful metrics from your numerical data.
+**Crispy** is a lightweight Python library designed to **identify, count, and analyze fragments** generated in **discrete solid mechanics simulations**. Whether you're working on dynamic fracture, debris tracking, or material rupture, `crispy` provides simple and robust tools to extract meaningful metrics from your numerical data.
 
-> 💥 From breakage to data — fast, clear, and crispy.
+> 💥 From breakage to data — fast, clear, and **crispy**.
 
 ---
 
 ## 📦 Features
 
-- 🔍 Detect and label discrete fragments from simulation outputs
+- 🔍 Detect and label fragments from discrete simulation outputs
 - 📊 Compute fragment size distributions and statistics
 - 🧱 Support for 2D and 3D domains (structured or unstructured)
 - 🧮 Works with numpy arrays, mesh files, or custom simulation outputs
@@ -22,10 +22,16 @@
 ### Installation
 
 ```bash
-pip install crispy-frag
+pip install git+https://github.com/DEBONDIUM/crispy.git
 ```
 
-> Note: The PyPI name might differ if `crispy` is already taken — e.g., `crispy-frag`.
+> Note: You can also clone and install manually:
+
+```bash
+git clone https://github.com/DEBONDIUM/crispy.git
+cd crispy
+pip install .
+```
 
 ### Example Usage
 

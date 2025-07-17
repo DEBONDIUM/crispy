@@ -181,6 +181,9 @@ class FragmentDetector:
         else:
             raise ValueError("Source must be a directory path or a list of AGDD files.")
         
+        if not self._agdd_files:
+            raise IndexError("Empty directory!")
+        
         self._fragments = []
         self._iterations_nb = len(self._agdd_files)
         self._seed = random.randint(0, 2**32 - 1)
