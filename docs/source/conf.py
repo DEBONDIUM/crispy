@@ -3,6 +3,10 @@
 # For the full list of built-in configuration values, see the documentation:
 # https://www.sphinx-doc.org/en/master/usage/configuration.html
 
+import sys
+from pathlib import Path
+sys.path.insert(0, str(Path(__file__).resolve().parents[2]))
+
 # -- Project information -----------------------------------------------------
 # https://www.sphinx-doc.org/en/master/usage/configuration.html#project-information
 
@@ -19,15 +23,19 @@ extensions = [
    'sphinx.ext.doctest',
    'sphinx.ext.autodoc',
    'sphinx.ext.autosummary',
+   'sphinx.ext.napoleon',
+   'sphinx.ext.viewcode',
 ]
 
 templates_path = ['_templates']
 exclude_patterns = []
 
-
-
 # -- Options for HTML output -------------------------------------------------
 # https://www.sphinx-doc.org/en/master/usage/configuration.html#options-for-html-output
+# Available themes: furo, sphinx_rtd_theme, sphinx_book_theme, pydata_sphinx_theme, alabaster
 
-html_theme = 'furo'
+html_theme = 'sphinx_rtd_theme'
 html_static_path = ['_static']
+
+autoclass_content = 'both'
+autodoc_member_order = 'bysource'

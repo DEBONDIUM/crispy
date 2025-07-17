@@ -1,11 +1,25 @@
-Welcome to Lumache's documentation!
-===================================
+.. crispy documentation master file
 
-**Lumache** (/lu'make/) is a Python library for cooks and food lovers that
-creates recipes mixing random ingredients.  It pulls data from the `Open Food
-Facts database <https://world.openfoodfacts.org/>`_ and offers a *simple* and
-*intuitive* API.
+Welcome to Crispy's documentation!
+==================================
 
-.. note::
+.. toctree::
+   :maxdepth: 2
+   :caption: Contents:
 
-   This project is under active development.
+   overview
+   installation
+   usage
+   api
+   examples
+
+
+Indices and tables
+==================
+
+* :ref:`genindex`
+* :ref:`modindex`
+* :ref:`search`
+
+
+
