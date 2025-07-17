@@ -25,7 +25,7 @@
 pip install git+https://github.com/DEBONDIUM/crispy.git
 ```
 
-> Note: You can also clone and install manually:
+You can also clone and install manually:
 
 ```bash
 git clone https://github.com/DEBONDIUM/crispy.git
@@ -33,68 +33,65 @@ cd crispy
 pip install .
 ```
 
-### Example Usage
+
+## 🧪 Example Usage
 
 ```python
-import crispy
+import crispy as cp
 
-# Load simulation output (e.g., binary mask of fractured domain)
-binary_field = load_my_simulation_field()
+detector = cp.FragmentDetector("path/to/agdd/files")
+detector.build_fragments()
 
-# Identify fragments
-labels = crispy.identify_fragments(binary_field)
-
-# Compute stats
-stats = crispy.compute_statistics(labels)
-
-# Visualize
-crispy.plot_fragments(labels)
+for i in range(detector.iterations_nb):
+    detector.plot2D(iteration=i, save=True)
 ```
+
+More examples are available in the [`examples/`](examples/) folder and in the [documentation](https://debondium.github.io/crispy).
 
 ---
 
 ## 📘 Documentation
 
-Full documentation with examples and API reference is available in the `docs/` folder or at:
-
-📎 [https://your-github-username.github.io/crispy](https://your-github-username.github.io/crispy)
+The full documentation (installation, API reference, usage examples) is available at:  
+🔗 https://debondium.github.io/crispy
 
 ---
 
 ## 🔬 Applications
 
-- Fracture mechanics
-- Impact simulations
-- Granular material studies
-- Discrete Element Method (DEM) post-processing
-- Crack propagation analysis
+- Fracture mechanics  
+- Impact simulations  
+- Granular material studies  
+- Discrete Element Method (DEM) post-processing  
+- Crack propagation analysis  
 
 ---
 
 ## 🛠 Dependencies
 
-- `numpy`
-- `scipy`
-- `matplotlib` (optional, for visualization)
+- [numpy](https://numpy.org)  
+- [scipy](https://scipy.org)  
+- [open3d](http://www.open3d.org)  
+- [matplotlib](https://matplotlib.org) *(optional, for 2D plotting)*  
 
 ---
 
 ## 🧑‍💻 Contributing
 
-Pull requests are welcome! Feel free to fork the repository, propose new features, or report bugs via GitHub Issues.
+Pull requests are welcome!  
+Feel free to fork the repository, propose new features, or report bugs via GitHub Issues.
 
 ---
 
 ## 📄 License
 
-MIT License — see [LICENSE](LICENSE) file for details.
+MIT License — see [LICENSE](LICENSE) for details.
 
 ---
 
 ## 👨‍🏫 Acknowledgments
 
-This library is developed for researchers and engineers working in **solid mechanics**, **computational physics**, and **fracture modeling**. If you use `crispy` in your work, please consider citing it or linking to the repository.
-
----
+This library is developed for researchers and engineers working in **solid mechanics**, **computational physics**, and **fracture modeling**.  
+If you use `crispy` in your work, please consider citing it or linking to the repository.
 
 > _“In the breaking of things lies the story of how they were made.”_
