@@ -69,10 +69,10 @@ The full documentation (installation, API reference, usage examples) is availabl
 
 ## 🛠 Dependencies
 
-- [numpy](https://numpy.org)  
-- [scipy](https://scipy.org)  
-- [open3d](http://www.open3d.org)  
-- [matplotlib](https://matplotlib.org) *(optional, for 2D plotting)*  
+- [Numpy](https://numpy.org)  
+- [Scipy](https://scipy.org)  
+- [Open3d](http://www.open3d.org)  
+- [Matplotlib](https://matplotlib.org)
 
 ---
 
