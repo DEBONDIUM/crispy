@@ -1,0 +1,1022 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>crispy.core &mdash; Crispy 0.1 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=03e43079" />
+      <link rel="stylesheet" type="text/css" href="../../_static/css/theme.css?v=e59714d7" />
+      <link rel="stylesheet" type="text/css" href="../../_static/custom.css?v=cb9177a2" />
+
+  
+      <script src="../../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../../_static/documentation_options.js?v=2709fde1"></script>
+      <script src="../../_static/doctools.js?v=9bcbadda"></script>
+      <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../index.html" class="icon icon-home">
+            Crispy
+              <img src="../../_static/logoII.png" class="logo" alt="Logo"/>
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../overview.html">Overview</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../installation.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../usage.html">Quick Start</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../api.html">API Reference</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../examples.html">Examples</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">Crispy</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">crispy.core</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for crispy.core</h1><div class="highlight"><pre>
+<span></span><span class="ch">#!/usr/bin/env python3</span>
+<span class="c1"># -*- coding: utf-8 -*-</span>
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">Created on Tue Jul  8 17:41:12 2025</span>
+
+<span class="sd">@author: lbremaud</span>
+<span class="sd">&quot;&quot;&quot;</span>
+
+<span class="c1"># =============================================================================</span>
+<span class="c1"># LIB</span>
+<span class="c1"># =============================================================================</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">List</span><span class="p">,</span> <span class="n">Union</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">open3d</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">o3d</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">scipy.sparse</span><span class="w"> </span><span class="kn">import</span> <span class="n">lil_matrix</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">scipy.sparse.csgraph</span><span class="w"> </span><span class="kn">import</span> <span class="n">connected_components</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">scipy.sparse</span><span class="w"> </span><span class="kn">import</span> <span class="n">csr_matrix</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">matplotlib.pyplot</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">plt</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">os</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">glob</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">networkx</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">nx</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">random</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">sys</span>
+
+<span class="c1"># =============================================================================</span>
+<span class="c1"># CLASS Viewer3D</span>
+<span class="c1"># =============================================================================</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">Viewer3D</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">crispy_instance</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        3D viewer of the fragments over all iterations.</span>
+<span class="sd">    </span>
+<span class="sd">        Args:</span>
+<span class="sd">            crispy_instance (FragmentDetector): An instance containing fragments and related data.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">crispy</span> <span class="o">=</span> <span class="n">crispy_instance</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">iteration</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">vis</span> <span class="o">=</span> <span class="n">o3d</span><span class="o">.</span><span class="n">visualization</span><span class="o">.</span><span class="n">VisualizerWithKeyCallback</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">cloud</span> <span class="o">=</span> <span class="n">o3d</span><span class="o">.</span><span class="n">geometry</span><span class="o">.</span><span class="n">PointCloud</span><span class="p">()</span>
+
+<span class="c1"># === Core methods ===</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">run</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Run the 3D viewer.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">vis</span><span class="o">.</span><span class="n">create_window</span><span class="p">(</span><span class="n">window_name</span><span class="o">=</span><span class="s2">&quot;Crispy 3D Viewer&quot;</span><span class="p">,</span> <span class="n">width</span><span class="o">=</span><span class="mi">1024</span><span class="p">,</span> <span class="n">height</span><span class="o">=</span><span class="mi">768</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_update_geometry</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">vis</span><span class="o">.</span><span class="n">add_geometry</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">cloud</span><span class="p">)</span>
+    
+        <span class="bp">self</span><span class="o">.</span><span class="n">vis</span><span class="o">.</span><span class="n">register_key_callback</span><span class="p">(</span><span class="mi">263</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_prev</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">vis</span><span class="o">.</span><span class="n">register_key_callback</span><span class="p">(</span><span class="mi">262</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_next</span><span class="p">)</span>
+    
+        <span class="bp">self</span><span class="o">.</span><span class="n">vis</span><span class="o">.</span><span class="n">run</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">vis</span><span class="o">.</span><span class="n">destroy_window</span><span class="p">()</span>
+        <span class="nb">print</span><span class="p">()</span>
+
+<span class="c1"># === Internal helpers ===</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_update_geometry</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Update the 3D viewer window.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">fragments</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">crispy</span><span class="o">.</span><span class="n">fragments</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">iteration</span><span class="p">]</span>
+        <span class="n">points</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="n">colors</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">for</span> <span class="n">fragment</span> <span class="ow">in</span> <span class="n">fragments</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">fragment</span><span class="o">.</span><span class="n">ID</span> <span class="o">!=</span> <span class="o">-</span><span class="mi">1</span><span class="p">:</span>
+                <span class="n">pts</span> <span class="o">=</span> <span class="n">fragment</span><span class="o">.</span><span class="n">nodes</span><span class="p">[:,</span> <span class="p">:</span><span class="mi">3</span><span class="p">]</span>
+                <span class="n">color</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">crispy</span><span class="o">.</span><span class="n">_random_color_ID</span><span class="p">(</span><span class="n">fragment</span><span class="o">.</span><span class="n">ID</span><span class="p">))</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">3</span><span class="p">)</span>
+                <span class="n">points</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">pts</span><span class="p">)</span>
+                <span class="n">colors</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">tile</span><span class="p">(</span><span class="n">color</span><span class="p">,</span> <span class="p">(</span><span class="n">pts</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="mi">1</span><span class="p">)))</span>
+        <span class="k">if</span> <span class="n">points</span><span class="p">:</span>
+            <span class="n">pts</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">vstack</span><span class="p">(</span><span class="n">points</span><span class="p">)</span>
+            <span class="n">cols</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">vstack</span><span class="p">(</span><span class="n">colors</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">cloud</span><span class="o">.</span><span class="n">points</span> <span class="o">=</span> <span class="n">o3d</span><span class="o">.</span><span class="n">utility</span><span class="o">.</span><span class="n">Vector3dVector</span><span class="p">(</span><span class="n">pts</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">cloud</span><span class="o">.</span><span class="n">colors</span> <span class="o">=</span> <span class="n">o3d</span><span class="o">.</span><span class="n">utility</span><span class="o">.</span><span class="n">Vector3dVector</span><span class="p">(</span><span class="n">cols</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">_print_progress_bar</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">iteration</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">crispy</span><span class="o">.</span><span class="n">fragments</span><span class="p">))</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">_next</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span>
+        <span class="n">vis</span><span class="p">:</span><span class="n">o3d</span><span class="o">.</span><span class="n">visualization</span><span class="o">.</span><span class="n">Visualizer</span>
+        <span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Callback to go to the next iteration in the 3D viewer.</span>
+<span class="sd">    </span>
+<span class="sd">        Args:</span>
+<span class="sd">            vis (open3d.visualization.Visualizer): The Open3D visualizer instance triggering the callback.</span>
+<span class="sd">    </span>
+<span class="sd">        Returns:</span>
+<span class="sd">            bool: False to indicate that the visualizer should continue running.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">iteration</span> <span class="o">&lt;</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">crispy</span><span class="o">.</span><span class="n">fragments</span><span class="p">)</span> <span class="o">-</span> <span class="mi">1</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">iteration</span> <span class="o">+=</span> <span class="mi">1</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_update_geometry</span><span class="p">()</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">vis</span><span class="o">.</span><span class="n">update_geometry</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">cloud</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">vis</span><span class="o">.</span><span class="n">poll_events</span><span class="p">()</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">vis</span><span class="o">.</span><span class="n">update_renderer</span><span class="p">()</span>
+        <span class="k">return</span> <span class="kc">False</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">_prev</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span>
+        <span class="n">vis</span><span class="p">:</span><span class="n">o3d</span><span class="o">.</span><span class="n">visualization</span><span class="o">.</span><span class="n">Visualizer</span>
+        <span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Callback to go to the previous iteration in the 3D viewer.</span>
+<span class="sd">    </span>
+<span class="sd">        Args:</span>
+<span class="sd">            vis (open3d.visualization.Visualizer): The Open3D visualizer instance triggering the callback.</span>
+<span class="sd">    </span>
+<span class="sd">        Returns:</span>
+<span class="sd">            bool: False to indicate that the visualizer should continue running.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">iteration</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">iteration</span> <span class="o">-=</span> <span class="mi">1</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_update_geometry</span><span class="p">()</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">vis</span><span class="o">.</span><span class="n">update_geometry</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">cloud</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">vis</span><span class="o">.</span><span class="n">poll_events</span><span class="p">()</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">vis</span><span class="o">.</span><span class="n">update_renderer</span><span class="p">()</span>
+        <span class="k">return</span> <span class="kc">False</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">_random_color_ID</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span>
+        <span class="n">ID</span><span class="p">:</span><span class="nb">int</span>
+        <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Generates a reproducible random RGB color based on the given ID.</span>
+<span class="sd">    </span>
+<span class="sd">        Args:</span>
+<span class="sd">            ID (int): A unique identifier used to seed the random generator.</span>
+<span class="sd">    </span>
+<span class="sd">        Returns:</span>
+<span class="sd">            np.ndarray: An array of 3 floats representing an RGB color in [0, 1].</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">seed</span><span class="p">(</span><span class="n">ID</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">rand</span><span class="p">(</span><span class="mi">3</span><span class="p">)</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">_print_progress_bar</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span>
+        <span class="n">iteration</span><span class="p">:</span><span class="nb">int</span><span class="p">,</span>
+        <span class="n">total</span><span class="p">:</span><span class="nb">int</span><span class="p">,</span>
+        <span class="n">length</span><span class="p">:</span><span class="nb">int</span> <span class="o">=</span> <span class="mi">40</span>
+        <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Display the progress bar of the simulation on the terminal.</span>
+<span class="sd">        </span>
+<span class="sd">        Args:</span>
+<span class="sd">            iteration (int): Iteration to show.</span>
+<span class="sd">            total (int): Number of iterations.</span>
+<span class="sd">            length (int, optional): Lentgh of the progress bar displayed in the terminal.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">percent</span> <span class="o">=</span> <span class="n">iteration</span> <span class="o">/</span> <span class="p">(</span><span class="n">total</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)</span> <span class="k">if</span> <span class="n">total</span> <span class="o">&gt;</span> <span class="mi">1</span> <span class="k">else</span> <span class="mi">1</span>
+        <span class="n">filled</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">length</span> <span class="o">*</span> <span class="n">percent</span><span class="p">)</span>
+        <span class="n">bar</span> <span class="o">=</span> <span class="s1">&#39;█&#39;</span> <span class="o">*</span> <span class="n">filled</span> <span class="o">+</span> <span class="s1">&#39;-&#39;</span> <span class="o">*</span> <span class="p">(</span><span class="n">length</span> <span class="o">-</span> <span class="n">filled</span><span class="p">)</span>
+        <span class="n">text</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;Progress: |</span><span class="si">{</span><span class="n">bar</span><span class="si">}</span><span class="s2">| </span><span class="si">{</span><span class="n">iteration</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="mi">1</span><span class="si">}</span><span class="s2">/</span><span class="si">{</span><span class="n">total</span><span class="si">}</span><span class="s2">&quot;</span>
+    
+        <span class="n">sys</span><span class="o">.</span><span class="n">stdout</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s1">&#39;</span><span class="se">\r</span><span class="s1">&#39;</span> <span class="o">+</span> <span class="n">text</span><span class="o">.</span><span class="n">ljust</span><span class="p">(</span><span class="mi">80</span><span class="p">))</span>
+        <span class="n">sys</span><span class="o">.</span><span class="n">stdout</span><span class="o">.</span><span class="n">flush</span><span class="p">()</span>
+
+<span class="c1"># =============================================================================</span>
+<span class="c1"># CLASS FragmentDetector</span>
+<span class="c1"># =============================================================================</span>
+<div class="viewcode-block" id="FragmentDetector">
+<a class="viewcode-back" href="../../api.html#crispy.FragmentDetector">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">FragmentDetector</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span>
+        <span class="n">source</span><span class="p">:</span><span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]],</span>
+        <span class="n">trash_treshold</span><span class="p">:</span><span class="nb">int</span> <span class="o">=</span> <span class="mi">10</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        This class loads AGDD files from a directory or list of file paths,</span>
+<span class="sd">        and provides methods to detect, visualize, and analyze fragments.</span>
+<span class="sd">        </span>
+<span class="sd">        Args:</span>
+<span class="sd">            source (str | list[str]): Path to a directory of AGDD files or a list of file paths.</span>
+<span class="sd">            trash_treshold (int, optional): Minimum number of points to consider a fragment.</span>
+<span class="sd">    </span>
+<span class="sd">        Raises:</span>
+<span class="sd">            ValueError: If `source` is not a string or a list of paths.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_trash_treshold</span> <span class="o">=</span> <span class="n">trash_treshold</span>
+
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">source</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_directory</span> <span class="o">=</span> <span class="n">source</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_agdd_files</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_load_agdd</span><span class="p">()</span>
+        <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">source</span><span class="p">,</span> <span class="nb">list</span><span class="p">):</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_directory</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">commonpath</span><span class="p">(</span><span class="n">source</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_agdd_files</span> <span class="o">=</span> <span class="nb">sorted</span><span class="p">(</span><span class="n">source</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Source must be a directory path or a list of AGDD files.&quot;</span><span class="p">)</span>
+        
+        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">_agdd_files</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">IndexError</span><span class="p">(</span><span class="s2">&quot;Empty directory!&quot;</span><span class="p">)</span>
+        
+        <span class="bp">self</span><span class="o">.</span><span class="n">_fragments</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_iterations_nb</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_agdd_files</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_seed</span> <span class="o">=</span> <span class="n">random</span><span class="o">.</span><span class="n">randint</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">2</span><span class="o">**</span><span class="mi">32</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_2d_plot_lim</span> <span class="o">=</span> <span class="p">[]</span>
+        
+<span class="c1"># === Core methods ===</span>
+<div class="viewcode-block" id="FragmentDetector.build_fragments">
+<a class="viewcode-back" href="../../api.html#crispy.FragmentDetector.build_fragments">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">build_fragments</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Detects fragments from the loaded AGDD files and stores them internally.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">for</span> <span class="n">iteration</span><span class="p">,</span> <span class="n">agdd_file</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_agdd_files</span><span class="p">):</span>
+            <span class="n">new_fragments</span> <span class="o">=</span> <span class="n">Fragment</span><span class="o">.</span><span class="n">detect_from_agdd</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">agdd_file</span><span class="p">,</span> <span class="n">iteration</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_trash_treshold</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_fragments</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">new_fragments</span><span class="p">)</span></div>
+
+    
+<div class="viewcode-block" id="FragmentDetector.get_fragments_by_ID">
+<a class="viewcode-back" href="../../api.html#crispy.FragmentDetector.get_fragments_by_ID">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_fragments_by_ID</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> 
+        <span class="n">ID</span><span class="p">:</span><span class="nb">int</span>
+        <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="s1">&#39;Fragment&#39;</span><span class="p">]:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Get all fragments that have the specified ID across all iterations.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            ID (int): Fragment ID.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            List[Fragment]: List of fragments with the given ID.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">list_</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">for</span> <span class="n">fragment_list</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_fragments</span><span class="p">:</span>
+            <span class="k">for</span> <span class="n">fragment</span> <span class="ow">in</span> <span class="n">fragment_list</span><span class="p">:</span>
+                <span class="k">if</span> <span class="n">fragment</span><span class="o">.</span><span class="n">ID</span> <span class="o">==</span> <span class="n">ID</span><span class="p">:</span>
+                    <span class="n">list_</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">fragment</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">list_</span></div>
+
+    
+<div class="viewcode-block" id="FragmentDetector.get_fragments_by_iteration">
+<a class="viewcode-back" href="../../api.html#crispy.FragmentDetector.get_fragments_by_iteration">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_fragments_by_iteration</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span>
+        <span class="n">iteration</span><span class="p">:</span><span class="nb">int</span>
+        <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="s1">&#39;Fragment&#39;</span><span class="p">]:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Return fragments for a specific iteration.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            iteration (int): Iteration index (must be &gt;= 0).</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            List[Fragment]: List of fragments for the given iteration.</span>
+
+<span class="sd">        Raises:</span>
+<span class="sd">            ValueError: If iteration is negative.</span>
+<span class="sd">            IndexError: If iteration is out of range.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">iteration</span> <span class="o">&lt;</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Iteration must be non-negative.&quot;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">iteration</span> <span class="o">&gt;=</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_fragments</span><span class="p">):</span>
+            <span class="k">raise</span> <span class="ne">IndexError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Iteration </span><span class="si">{</span><span class="n">iteration</span><span class="si">}</span><span class="s2"> is out of range (max is </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_fragments</span><span class="p">)</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="mi">1</span><span class="si">}</span><span class="s2">).&quot;</span><span class="p">)</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_fragments</span><span class="p">[</span><span class="n">iteration</span><span class="p">]</span></div>
+
+    
+<div class="viewcode-block" id="FragmentDetector.save">
+<a class="viewcode-back" href="../../api.html#crispy.FragmentDetector.save">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">save</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Save all fragment data to text files in a &#39;txt&#39; subfolder.</span>
+
+<span class="sd">        Raises:</span>
+<span class="sd">            ValueError: If no fragments have been built.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">fragments</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;No fragments built!&quot;</span><span class="p">)</span>
+            
+        <span class="n">os</span><span class="o">.</span><span class="n">makedirs</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_directory</span><span class="p">,</span> <span class="s1">&#39;txt&#39;</span><span class="p">),</span> <span class="n">exist_ok</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+            
+        <span class="k">for</span> <span class="n">fragment_list</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_fragments</span><span class="p">:</span>
+            <span class="k">for</span> <span class="n">fragment</span> <span class="ow">in</span> <span class="n">fragment_list</span><span class="p">:</span>
+                <span class="n">ID</span> <span class="o">=</span> <span class="n">fragment</span><span class="o">.</span><span class="n">ID</span>
+                <span class="n">iteration</span> <span class="o">=</span> <span class="n">fragment</span><span class="o">.</span><span class="n">iteration</span>
+                <span class="n">area</span> <span class="o">=</span> <span class="n">fragment</span><span class="o">.</span><span class="n">area</span>
+                <span class="n">parentIDs</span> <span class="o">=</span> <span class="n">fragment</span><span class="o">.</span><span class="n">parentIDs</span>
+                <span class="n">parentIDs</span> <span class="o">=</span> <span class="s1">&#39;</span><span class="se">\t</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">pid</span><span class="p">)</span> <span class="k">for</span> <span class="n">pid</span> <span class="ow">in</span> <span class="n">fragment</span><span class="o">.</span><span class="n">parentIDs</span><span class="p">)</span>
+                <span class="n">nodeIDs</span> <span class="o">=</span> <span class="n">fragment</span><span class="o">.</span><span class="n">nodeIDs</span>
+                <span class="n">nodes</span> <span class="o">=</span> <span class="n">fragment</span><span class="o">.</span><span class="n">nodes</span>
+                <span class="n">bondIDs</span> <span class="o">=</span> <span class="n">fragment</span><span class="o">.</span><span class="n">bondIDs</span>
+                <span class="n">bonds</span> <span class="o">=</span> <span class="n">fragment</span><span class="o">.</span><span class="n">bonds</span>
+
+                
+                <span class="n">filename</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_directory</span><span class="p">,</span> <span class="s1">&#39;txt&#39;</span><span class="p">,</span> <span class="sa">f</span><span class="s2">&quot;fragment_ID</span><span class="si">{</span><span class="n">ID</span><span class="si">}</span><span class="s2">_iteration</span><span class="si">{</span><span class="n">iteration</span><span class="si">}</span><span class="s2">.txt&quot;</span><span class="p">)</span>
+                <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">filename</span><span class="p">,</span> <span class="s1">&#39;w&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">file</span><span class="p">:</span>
+                    <span class="n">file</span><span class="o">.</span><span class="n">write</span><span class="p">(</span>
+                        <span class="sa">f</span><span class="s2">&quot;# ID</span><span class="se">\n</span><span class="si">{</span><span class="n">ID</span><span class="si">}</span><span class="se">\n</span><span class="s2">&quot;</span>
+                        <span class="sa">f</span><span class="s2">&quot;# Iteration</span><span class="se">\n</span><span class="si">{</span><span class="n">iteration</span><span class="si">}</span><span class="se">\n</span><span class="s2">&quot;</span>
+                        <span class="sa">f</span><span class="s2">&quot;# Area [%]</span><span class="se">\n</span><span class="si">{</span><span class="n">area</span><span class="si">}</span><span class="se">\n</span><span class="s2">&quot;</span>
+                         <span class="s2">&quot;# Parent IDs</span><span class="se">\n</span><span class="s2">&quot;</span>
+                    <span class="p">)</span>
+                    <span class="n">file</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">parentIDs</span> <span class="o">+</span> <span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">)</span>
+                
+                    <span class="c1"># Write node IDs and their coordinates</span>
+                    <span class="n">file</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s2">&quot;# NodeID / X / Y / Z / R</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">)</span>
+                    <span class="k">for</span> <span class="n">node_id</span><span class="p">,</span> <span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">z</span><span class="p">,</span> <span class="n">r</span><span class="p">)</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">nodeIDs</span><span class="p">,</span> <span class="n">nodes</span><span class="p">):</span>
+                        <span class="n">file</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">node_id</span><span class="si">}</span><span class="se">\t</span><span class="si">{</span><span class="n">x</span><span class="si">:</span><span class="s2">.6f</span><span class="si">}</span><span class="se">\t</span><span class="si">{</span><span class="n">y</span><span class="si">:</span><span class="s2">.6f</span><span class="si">}</span><span class="se">\t</span><span class="si">{</span><span class="n">z</span><span class="si">:</span><span class="s2">.6f</span><span class="si">}</span><span class="se">\t</span><span class="si">{</span><span class="n">r</span><span class="si">:</span><span class="s2">.6f</span><span class="si">}</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">)</span>
+                
+                    <span class="c1"># Write bond IDs and the nodes they connect</span>
+                    <span class="n">file</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s2">&quot;# BondID / Node1 / Node2</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">)</span>
+                    <span class="k">for</span> <span class="n">bond_id</span><span class="p">,</span> <span class="p">(</span><span class="n">n1</span><span class="p">,</span> <span class="n">n2</span><span class="p">)</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">bondIDs</span><span class="p">,</span> <span class="n">bonds</span><span class="p">):</span>
+                        <span class="n">file</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">bond_id</span><span class="si">}</span><span class="se">\t</span><span class="si">{</span><span class="n">n1</span><span class="si">}</span><span class="se">\t</span><span class="si">{</span><span class="n">n2</span><span class="si">}</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">)</span>
+        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Fragments data have been saved in </span><span class="si">{</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_directory</span><span class="p">,</span><span class="w"> </span><span class="s1">&#39;txt&#39;</span><span class="p">)</span><span class="si">}</span><span class="s2">.&quot;</span><span class="p">)</span></div>
+
+
+<span class="c1"># === Visualization ===</span>
+<div class="viewcode-block" id="FragmentDetector.plot2D">
+<a class="viewcode-back" href="../../api.html#crispy.FragmentDetector.plot2D">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">plot2D</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span>
+        <span class="n">iteration</span><span class="p">:</span><span class="nb">int</span><span class="p">,</span>
+        <span class="n">show_trash</span><span class="p">:</span><span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
+        <span class="n">show_bonds</span><span class="p">:</span><span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
+        <span class="n">auto_close</span><span class="p">:</span><span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
+        <span class="n">dot_size</span><span class="p">:</span><span class="nb">int</span> <span class="o">=</span> <span class="mi">4</span><span class="p">,</span>
+        <span class="n">rigid_lim</span><span class="p">:</span><span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
+        <span class="n">border_coef</span><span class="p">:</span><span class="nb">float</span> <span class="o">=</span> <span class="mf">1.5</span><span class="p">,</span>
+        <span class="n">save</span><span class="p">:</span><span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
+        <span class="n">save_format</span><span class="p">:</span><span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;png&quot;</span>
+        <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Plot a 2D scatter plot of fragment nodes for a given iteration.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            iteration (int): Iteration index to plot.</span>
+<span class="sd">            show_trash (bool): Whether to show trash fragments (ID = -1).</span>
+<span class="sd">            show_bonds (bool): Whether to show bonds between nodes.</span>
+<span class="sd">            auto_close (bool): Whether to automatically close the plot window.</span>
+<span class="sd">            dot_size (int): Size of the dots for each node.</span>
+<span class="sd">            rigid_lim (bool): Whether to keep the axis limits fixed after first plot.</span>
+<span class="sd">            border_coef (float): Expansion factor for plot borders.</span>
+<span class="sd">            save (bool): Whether to save the plot as an image.</span>
+<span class="sd">            save_format (str): File format to save image (e.g., &quot;png&quot;, &quot;pdf&quot;).</span>
+
+<span class="sd">        Raises:</span>
+<span class="sd">            ValueError: If no fragments were built before plotting.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">fragments</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;No fragments built!&quot;</span><span class="p">)</span>
+        
+        <span class="n">fragments</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_fragments_by_iteration</span><span class="p">(</span><span class="n">iteration</span><span class="p">)</span>
+
+        <span class="n">fig</span><span class="p">,</span> <span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="n">figsize</span> <span class="o">=</span> <span class="p">(</span><span class="mi">6</span><span class="p">,</span> <span class="mi">6</span><span class="p">))</span>
+        <span class="k">for</span> <span class="n">fragment</span> <span class="ow">in</span> <span class="n">fragments</span><span class="p">:</span>
+            <span class="n">nodes</span> <span class="o">=</span> <span class="n">fragment</span><span class="o">.</span><span class="n">nodes</span>
+            <span class="n">ID</span> <span class="o">=</span> <span class="n">fragment</span><span class="o">.</span><span class="n">ID</span>
+            <span class="n">nodeIDs</span> <span class="o">=</span> <span class="n">fragment</span><span class="o">.</span><span class="n">nodeIDs</span>
+            <span class="n">bonds</span> <span class="o">=</span> <span class="n">fragment</span><span class="o">.</span><span class="n">bonds</span>
+            
+            <span class="k">if</span> <span class="n">ID</span> <span class="o">!=</span> <span class="o">-</span><span class="mi">1</span><span class="p">:</span>
+                <span class="n">ax</span><span class="o">.</span><span class="n">scatter</span><span class="p">(</span><span class="n">nodes</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">],</span> <span class="n">nodes</span><span class="p">[:,</span> <span class="mi">1</span><span class="p">],</span> <span class="n">s</span><span class="o">=</span><span class="n">dot_size</span><span class="p">,</span> <span class="n">c</span><span class="o">=</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">_random_color_ID</span><span class="p">(</span><span class="n">ID</span><span class="p">)])</span>
+                <span class="n">centroid</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">nodes</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+                <span class="n">ax</span><span class="o">.</span><span class="n">text</span><span class="p">(</span><span class="n">centroid</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">centroid</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">ID</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s1">&#39;k&#39;</span><span class="p">,</span> <span class="n">fontsize</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span> <span class="n">weight</span><span class="o">=</span><span class="s1">&#39;bold&#39;</span><span class="p">,</span> <span class="n">clip_on</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+                
+                <span class="k">if</span> <span class="n">show_bonds</span><span class="p">:</span>
+                    <span class="k">for</span> <span class="n">bond</span> <span class="ow">in</span> <span class="n">bonds</span><span class="p">:</span>
+                        <span class="n">x1</span> <span class="o">=</span> <span class="n">nodes</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">bond</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">==</span> <span class="n">nodeIDs</span><span class="p">)[</span><span class="mi">0</span><span class="p">],</span> <span class="mi">0</span><span class="p">]</span>
+                        <span class="n">y1</span> <span class="o">=</span> <span class="n">nodes</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">bond</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">==</span> <span class="n">nodeIDs</span><span class="p">)[</span><span class="mi">0</span><span class="p">],</span> <span class="mi">1</span><span class="p">]</span>
+                        <span class="n">x2</span> <span class="o">=</span> <span class="n">nodes</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">bond</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">==</span> <span class="n">nodeIDs</span><span class="p">)[</span><span class="mi">0</span><span class="p">],</span> <span class="mi">0</span><span class="p">]</span>
+                        <span class="n">y2</span> <span class="o">=</span> <span class="n">nodes</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">bond</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">==</span> <span class="n">nodeIDs</span><span class="p">)[</span><span class="mi">0</span><span class="p">],</span> <span class="mi">1</span><span class="p">]</span>
+                        <span class="n">ax</span><span class="o">.</span><span class="n">plot</span><span class="p">([</span><span class="n">x1</span><span class="p">,</span> <span class="n">x2</span><span class="p">],</span> <span class="p">[</span><span class="n">y1</span><span class="p">,</span> <span class="n">y2</span><span class="p">],</span> <span class="s1">&#39;-&#39;</span><span class="p">,</span> <span class="n">c</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_random_color_ID</span><span class="p">(</span><span class="n">ID</span><span class="p">))</span>
+            <span class="k">elif</span> <span class="n">show_trash</span><span class="p">:</span>
+                <span class="n">ax</span><span class="o">.</span><span class="n">scatter</span><span class="p">(</span><span class="n">nodes</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">],</span> <span class="n">nodes</span><span class="p">[:,</span> <span class="mi">1</span><span class="p">],</span> <span class="n">s</span><span class="o">=</span><span class="n">dot_size</span><span class="p">,</span> <span class="n">c</span><span class="o">=</span><span class="s1">&#39;k&#39;</span><span class="p">)</span>
+        
+        <span class="n">fig</span><span class="o">.</span><span class="n">patch</span><span class="o">.</span><span class="n">set_facecolor</span><span class="p">(</span><span class="s1">&#39;white&#39;</span><span class="p">)</span>
+        <span class="n">ax</span><span class="o">.</span><span class="n">set_facecolor</span><span class="p">(</span><span class="s1">&#39;white&#39;</span><span class="p">)</span>
+        <span class="n">ax</span><span class="o">.</span><span class="n">set_xticks</span><span class="p">([])</span>
+        <span class="n">ax</span><span class="o">.</span><span class="n">set_yticks</span><span class="p">([])</span>
+        <span class="n">ax</span><span class="o">.</span><span class="n">tick_params</span><span class="p">(</span><span class="n">labelbottom</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">labelleft</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+        <span class="n">ax</span><span class="o">.</span><span class="n">set_xlabel</span><span class="p">(</span><span class="s2">&quot;&quot;</span><span class="p">)</span>
+        <span class="n">ax</span><span class="o">.</span><span class="n">set_ylabel</span><span class="p">(</span><span class="s2">&quot;&quot;</span><span class="p">)</span>
+        <span class="n">ax</span><span class="o">.</span><span class="n">axis</span><span class="p">(</span><span class="s1">&#39;equal&#39;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">rigid_lim</span> <span class="ow">and</span> <span class="n">iteration</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_2d_plot_lim</span> <span class="o">=</span> <span class="p">[(</span><span class="n">ax</span><span class="o">.</span><span class="n">get_xlim</span><span class="p">()[</span><span class="mi">0</span><span class="p">]</span> <span class="o">*</span> <span class="n">border_coef</span><span class="p">,</span> <span class="n">ax</span><span class="o">.</span><span class="n">get_xlim</span><span class="p">()[</span><span class="mi">1</span><span class="p">]</span> <span class="o">*</span> <span class="n">border_coef</span><span class="p">),</span>
+                                 <span class="p">(</span><span class="n">ax</span><span class="o">.</span><span class="n">get_ylim</span><span class="p">()[</span><span class="mi">0</span><span class="p">]</span> <span class="o">*</span> <span class="n">border_coef</span><span class="p">,</span> <span class="n">ax</span><span class="o">.</span><span class="n">get_ylim</span><span class="p">()[</span><span class="mi">1</span><span class="p">]</span> <span class="o">*</span> <span class="n">border_coef</span><span class="p">)]</span>
+        <span class="n">ax</span><span class="o">.</span><span class="n">set_xlim</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_2d_plot_lim</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+        <span class="n">ax</span><span class="o">.</span><span class="n">set_ylim</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_2d_plot_lim</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
+        <span class="n">plt</span><span class="o">.</span><span class="n">tight_layout</span><span class="p">()</span>
+        
+        <span class="k">if</span> <span class="n">save</span><span class="p">:</span>
+            <span class="n">os</span><span class="o">.</span><span class="n">makedirs</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_directory</span><span class="p">,</span> <span class="s1">&#39;img&#39;</span><span class="p">),</span> <span class="n">exist_ok</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+            <span class="n">filename</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_directory</span><span class="p">,</span> <span class="s1">&#39;img&#39;</span><span class="p">,</span> <span class="sa">f</span><span class="s2">&quot;plot2D_iteration</span><span class="si">{</span><span class="n">iteration</span><span class="si">}</span><span class="s2">.</span><span class="si">{</span><span class="n">save_format</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+            <span class="n">plt</span><span class="o">.</span><span class="n">savefig</span><span class="p">(</span><span class="n">filename</span><span class="p">,</span> <span class="nb">format</span><span class="o">=</span><span class="n">save_format</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">auto_close</span><span class="p">:</span>
+            <span class="n">plt</span><span class="o">.</span><span class="n">close</span><span class="p">(</span><span class="n">fig</span><span class="p">)</span></div>
+
+    
+<div class="viewcode-block" id="FragmentDetector.stackplot">
+<a class="viewcode-back" href="../../api.html#crispy.FragmentDetector.stackplot">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">stackplot</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span>
+        <span class="n">xgrid</span><span class="p">:</span><span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
+        <span class="n">interline</span><span class="p">:</span><span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
+        <span class="n">auto_close</span><span class="p">:</span><span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
+        <span class="n">save</span><span class="p">:</span><span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
+        <span class="n">save_format</span><span class="p">:</span><span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;png&quot;</span>
+        <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Plot a stack graph of fragment repartition over all iterations.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            xgrid (bool): Wether to show vertical line marking iterations.</span>
+<span class="sd">            interline (bool): Whether to show line between fragments repartition.</span>
+<span class="sd">            auto_close (bool): Whether to automatically close the plot window.</span>
+<span class="sd">            save (bool): Whether to save the plot as an image.</span>
+<span class="sd">            save_format (str): File format to save image (e.g., &quot;png&quot;, &quot;pdf&quot;).</span>
+
+<span class="sd">        Raises:</span>
+<span class="sd">            ValueError: If no fragments were built before plotting.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">fragments</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;No fragments built!&quot;</span><span class="p">)</span>
+                
+        <span class="n">IDs</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">for</span> <span class="n">fragment_list</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_fragments</span><span class="p">:</span>
+            <span class="k">for</span> <span class="n">fragment</span> <span class="ow">in</span> <span class="n">fragment_list</span><span class="p">:</span>
+                <span class="n">IDs</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">fragment</span><span class="o">.</span><span class="n">ID</span><span class="p">)</span>
+        <span class="n">IDs</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">unique</span><span class="p">(</span><span class="n">IDs</span><span class="p">)</span>
+        
+        <span class="n">colors</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;k&#39;</span><span class="p">]</span> <span class="o">+</span> <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">_random_color_ID</span><span class="p">(</span><span class="n">ID</span><span class="p">)</span> <span class="k">for</span> <span class="n">ID</span> <span class="ow">in</span> <span class="n">IDs</span> <span class="k">if</span> <span class="n">ID</span> <span class="o">!=</span> <span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+        <span class="n">iterations</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">iterations_nb</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">int</span><span class="p">)</span>
+        
+        <span class="n">data</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="nb">len</span><span class="p">(</span><span class="n">IDs</span><span class="p">),</span> <span class="nb">len</span><span class="p">(</span><span class="n">iterations</span><span class="p">)))</span>
+        <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">ID</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">IDs</span><span class="p">):</span>
+            <span class="n">fragments</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_fragments_by_ID</span><span class="p">(</span><span class="n">ID</span><span class="p">)</span>
+            <span class="k">for</span> <span class="n">fragment</span> <span class="ow">in</span> <span class="n">fragments</span><span class="p">:</span>
+                <span class="n">data</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="n">fragment</span><span class="o">.</span><span class="n">iteration</span><span class="p">]</span> <span class="o">=</span> <span class="n">fragment</span><span class="o">.</span><span class="n">area</span>
+        <span class="n">cumulative_data</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">cumsum</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+        
+        <span class="n">fig</span><span class="p">,</span> <span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">10</span><span class="p">,</span> <span class="mi">6</span><span class="p">))</span>
+        <span class="n">ax</span><span class="o">.</span><span class="n">stackplot</span><span class="p">(</span><span class="n">iterations</span><span class="p">,</span> <span class="n">data</span><span class="p">,</span> <span class="n">labels</span><span class="o">=</span><span class="n">IDs</span><span class="p">,</span> <span class="n">colors</span><span class="o">=</span><span class="n">colors</span><span class="p">,</span> <span class="n">alpha</span><span class="o">=</span><span class="mf">0.8</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">xgrid</span><span class="p">:</span>
+            <span class="k">for</span> <span class="n">iteration</span> <span class="ow">in</span> <span class="n">iterations</span><span class="p">:</span> <span class="n">ax</span><span class="o">.</span><span class="n">axvline</span><span class="p">(</span><span class="n">x</span><span class="o">=</span><span class="n">iteration</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s1">&#39;k&#39;</span><span class="p">,</span> <span class="n">linestyle</span><span class="o">=</span><span class="s1">&#39;--&#39;</span><span class="p">,</span> <span class="n">linewidth</span><span class="o">=</span><span class="mf">0.5</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">interline</span><span class="p">:</span>
+            <span class="k">for</span> <span class="n">line</span> <span class="ow">in</span> <span class="n">cumulative_data</span><span class="p">[:</span><span class="o">-</span><span class="mi">1</span><span class="p">]:</span> <span class="n">ax</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">iterations</span><span class="p">,</span> <span class="n">line</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s2">&quot;black&quot;</span><span class="p">,</span> <span class="n">linewidth</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+        
+        <span class="n">ax</span><span class="o">.</span><span class="n">legend</span><span class="p">(</span><span class="n">loc</span><span class="o">=</span><span class="s1">&#39;center left&#39;</span><span class="p">,</span> <span class="n">framealpha</span><span class="o">=</span><span class="mf">1.</span><span class="p">,</span> <span class="n">bbox_to_anchor</span><span class="o">=</span><span class="p">(</span><span class="mf">1.</span><span class="p">,</span> <span class="mf">0.5</span><span class="p">))</span>
+        <span class="n">ax</span><span class="o">.</span><span class="n">set_xlim</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">max</span><span class="p">(</span><span class="n">iterations</span><span class="p">)</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)</span>
+        <span class="n">ax</span><span class="o">.</span><span class="n">set_ylim</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">100</span><span class="p">)</span>
+        <span class="n">ax</span><span class="o">.</span><span class="n">set_xlabel</span><span class="p">(</span><span class="s2">&quot;Iterations&quot;</span><span class="p">,</span> <span class="n">fontsize</span><span class="o">=</span><span class="mi">10</span><span class="p">)</span>
+        <span class="n">ax</span><span class="o">.</span><span class="n">set_ylabel</span><span class="p">(</span><span class="s2">&quot;Area / %&quot;</span><span class="p">,</span> <span class="n">fontsize</span><span class="o">=</span><span class="mi">10</span><span class="p">)</span>
+        <span class="n">plt</span><span class="o">.</span><span class="n">tight_layout</span><span class="p">()</span>
+        
+        <span class="k">if</span> <span class="n">save</span><span class="p">:</span>
+            <span class="n">os</span><span class="o">.</span><span class="n">makedirs</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_directory</span><span class="p">,</span> <span class="s1">&#39;img&#39;</span><span class="p">),</span> <span class="n">exist_ok</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+            <span class="n">filename</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_directory</span><span class="p">,</span> <span class="s1">&#39;img&#39;</span><span class="p">,</span> <span class="sa">f</span><span class="s2">&quot;stackplot.</span><span class="si">{</span><span class="n">save_format</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+            <span class="n">plt</span><span class="o">.</span><span class="n">savefig</span><span class="p">(</span><span class="n">filename</span><span class="p">,</span> <span class="nb">format</span><span class="o">=</span><span class="n">save_format</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">auto_close</span><span class="p">:</span>
+            <span class="n">plt</span><span class="o">.</span><span class="n">close</span><span class="p">(</span><span class="n">fig</span><span class="p">)</span></div>
+
+    
+<div class="viewcode-block" id="FragmentDetector.graphplot">
+<a class="viewcode-back" href="../../api.html#crispy.FragmentDetector.graphplot">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">graphplot</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span>
+        <span class="n">auto_close</span><span class="p">:</span><span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
+        <span class="n">save</span><span class="p">:</span><span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
+        <span class="n">save_format</span><span class="p">:</span><span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;png&quot;</span>
+        <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Plot a network graph of fragments.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            auto_close (bool): Whether to automatically close the plot window.</span>
+<span class="sd">            save (bool): Whether to save the plot as an image.</span>
+<span class="sd">            save_format (str): File format to save image (e.g., &quot;png&quot;, &quot;pdf&quot;).</span>
+
+<span class="sd">        Raises:</span>
+<span class="sd">            ValueError: If no fragments were built before plotting.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">fragments</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;No fragments built!&quot;</span><span class="p">)</span>
+
+        <span class="n">IDs</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">for</span> <span class="n">fragment_list</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_fragments</span><span class="p">:</span>
+            <span class="k">for</span> <span class="n">fragment</span> <span class="ow">in</span> <span class="n">fragment_list</span><span class="p">:</span>
+                <span class="n">IDs</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">fragment</span><span class="o">.</span><span class="n">ID</span><span class="p">)</span>
+        <span class="n">IDs</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">unique</span><span class="p">(</span><span class="n">IDs</span><span class="p">)</span>
+
+        <span class="n">tree</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">for</span> <span class="n">ID</span> <span class="ow">in</span> <span class="n">IDs</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">ID</span> <span class="o">!=</span> <span class="o">-</span><span class="mi">1</span><span class="p">:</span>
+                <span class="k">for</span> <span class="n">fragment</span> <span class="ow">in</span>  <span class="bp">self</span><span class="o">.</span><span class="n">get_fragments_by_ID</span><span class="p">(</span><span class="n">ID</span><span class="p">):</span>
+                    <span class="n">tree</span><span class="o">.</span><span class="n">append</span><span class="p">([</span><span class="n">ID</span><span class="p">,</span> <span class="n">fragment</span><span class="o">.</span><span class="n">parentIDs</span><span class="p">,</span> <span class="n">fragment</span><span class="o">.</span><span class="n">iteration</span><span class="p">,</span> <span class="n">fragment</span><span class="o">.</span><span class="n">area</span><span class="p">])</span>
+    
+        <span class="n">G</span> <span class="o">=</span> <span class="n">nx</span><span class="o">.</span><span class="n">DiGraph</span><span class="p">()</span>
+
+        <span class="n">areas</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="k">for</span> <span class="n">fragment</span> <span class="ow">in</span> <span class="n">tree</span><span class="p">:</span>
+            <span class="n">ID</span><span class="p">,</span> <span class="n">parentIDs</span><span class="p">,</span> <span class="n">iteration</span><span class="p">,</span> <span class="n">area</span> <span class="o">=</span> <span class="n">fragment</span>
+            <span class="n">areas</span><span class="p">[</span><span class="n">ID</span><span class="p">]</span> <span class="o">=</span> <span class="n">area</span>
+            <span class="k">for</span> <span class="n">parentID</span> <span class="ow">in</span> <span class="n">parentIDs</span><span class="p">:</span>
+                <span class="k">if</span> <span class="n">parentID</span> <span class="o">!=</span> <span class="n">ID</span><span class="p">:</span>
+                    <span class="n">G</span><span class="o">.</span><span class="n">add_edge</span><span class="p">(</span><span class="n">parentID</span><span class="p">,</span> <span class="n">ID</span><span class="p">)</span>
+        
+        <span class="n">pos</span> <span class="o">=</span> <span class="n">nx</span><span class="o">.</span><span class="n">nx_agraph</span><span class="o">.</span><span class="n">graphviz_layout</span><span class="p">(</span><span class="n">G</span><span class="p">,</span> <span class="n">prog</span><span class="o">=</span><span class="s2">&quot;twopi&quot;</span><span class="p">)</span>
+            
+        <span class="n">min_size</span> <span class="o">=</span> <span class="mi">500</span>
+        <span class="n">sizes</span> <span class="o">=</span> <span class="p">[</span><span class="nb">max</span><span class="p">(</span><span class="n">areas</span><span class="p">[</span><span class="n">node</span><span class="p">]</span> <span class="o">*</span> <span class="n">min_size</span><span class="p">,</span> <span class="n">min_size</span><span class="p">)</span> <span class="k">for</span> <span class="n">node</span> <span class="ow">in</span> <span class="n">G</span><span class="o">.</span><span class="n">nodes</span><span class="p">]</span>
+        
+        <span class="c1"># colors</span>
+        <span class="n">colors</span> <span class="o">=</span> <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">_random_color_ID</span><span class="p">(</span><span class="n">node</span><span class="p">)</span> <span class="k">for</span> <span class="n">node</span> <span class="ow">in</span> <span class="n">G</span><span class="o">.</span><span class="n">nodes</span><span class="p">]</span>
+    
+        <span class="n">fig</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">figure</span><span class="p">(</span><span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">12</span><span class="p">,</span> <span class="mi">8</span><span class="p">))</span>
+        <span class="n">nx</span><span class="o">.</span><span class="n">draw</span><span class="p">(</span><span class="n">G</span><span class="p">,</span> <span class="n">pos</span><span class="p">,</span>
+                <span class="n">with_labels</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+                <span class="n">node_size</span><span class="o">=</span><span class="n">sizes</span><span class="p">,</span>
+                <span class="n">node_color</span><span class="o">=</span><span class="n">colors</span><span class="p">,</span>
+                <span class="n">font_size</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span>
+                <span class="n">font_weight</span><span class="o">=</span><span class="s2">&quot;bold&quot;</span><span class="p">,</span>
+                <span class="n">edge_color</span><span class="o">=</span><span class="s2">&quot;k&quot;</span><span class="p">,</span>
+                <span class="n">edgecolors</span><span class="o">=</span><span class="s2">&quot;k&quot;</span><span class="p">)</span>
+        
+        <span class="k">if</span> <span class="n">save</span><span class="p">:</span>
+            <span class="n">os</span><span class="o">.</span><span class="n">makedirs</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_directory</span><span class="p">,</span> <span class="s1">&#39;img&#39;</span><span class="p">),</span> <span class="n">exist_ok</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+            <span class="n">filename</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_directory</span><span class="p">,</span> <span class="s1">&#39;img&#39;</span><span class="p">,</span> <span class="sa">f</span><span class="s2">&quot;graphplot.</span><span class="si">{</span><span class="n">save_format</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+            <span class="n">plt</span><span class="o">.</span><span class="n">savefig</span><span class="p">(</span><span class="n">filename</span><span class="p">,</span> <span class="nb">format</span><span class="o">=</span><span class="n">save_format</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">auto_close</span><span class="p">:</span>
+            <span class="n">plt</span><span class="o">.</span><span class="n">close</span><span class="p">(</span><span class="n">fig</span><span class="p">)</span></div>
+
+    
+<div class="viewcode-block" id="FragmentDetector.viewer3D">
+<a class="viewcode-back" href="../../api.html#crispy.FragmentDetector.viewer3D">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">viewer3D</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Launch a 3D viewer to display detected fragments.</span>
+<span class="sd">        </span>
+<span class="sd">        Raises:</span>
+<span class="sd">            ValueError: If no fragments have been built.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">fragments</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;No fragments built!&quot;</span><span class="p">)</span>
+            
+        <span class="n">viewer</span> <span class="o">=</span> <span class="n">Viewer3D</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
+        <span class="n">viewer</span><span class="o">.</span><span class="n">run</span><span class="p">()</span></div>
+
+
+<span class="c1"># === Internal helpers ===</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_load_agdd</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Load the AGDD files from the work directory.</span>
+<span class="sd">    </span>
+<span class="sd">        Returns:</span>
+<span class="sd">            List[str]: List of AGDD paths.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">agdd_files</span> <span class="o">=</span> <span class="n">glob</span><span class="o">.</span><span class="n">glob</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_directory</span><span class="p">,</span> <span class="s2">&quot;*.agdd&quot;</span><span class="p">))</span>
+        <span class="n">agdd_files</span><span class="o">.</span><span class="n">sort</span><span class="p">()</span>
+        <span class="k">return</span> <span class="n">agdd_files</span>
+    
+    <span class="k">def</span><span class="w"> </span><span class="nf">_get_fragments_by_iteration_safe</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span>
+        <span class="n">iteration</span><span class="p">:</span><span class="nb">int</span>
+        <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="s1">&#39;Fragment&#39;</span><span class="p">]:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Return a list of fragments at a given iteration.</span>
+<span class="sd">    </span>
+<span class="sd">        Args:</span>
+<span class="sd">            iteration (int): The iteration at which the fragments are detected.</span>
+<span class="sd">    </span>
+<span class="sd">        Returns:</span>
+<span class="sd">            List[&#39;Fragment&#39;]: List of fragments detected at the given iteration.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="mi">0</span> <span class="o">&lt;=</span> <span class="n">iteration</span> <span class="o">&lt;</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_fragments</span><span class="p">):</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_fragments</span><span class="p">[</span><span class="n">iteration</span><span class="p">]</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">return</span> <span class="p">[]</span>
+    
+    <span class="k">def</span><span class="w"> </span><span class="nf">_random_color_ID</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span>
+        <span class="n">ID</span><span class="p">:</span><span class="nb">int</span>
+        <span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">tuple</span><span class="p">[</span><span class="nb">float</span><span class="p">]:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Generates a reproducible random RGB color based on the given ID.</span>
+<span class="sd">    </span>
+<span class="sd">        Args:</span>
+<span class="sd">            ID (int): A unique identifier used to seed the random generator.</span>
+<span class="sd">    </span>
+<span class="sd">        Returns:</span>
+<span class="sd">            np.ndarray: An array of 3 floats representing an RGB color in [0, 1].</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">seed</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_seed</span> <span class="o">+</span> <span class="n">ID</span><span class="p">)</span>
+        <span class="n">r</span><span class="p">,</span> <span class="n">g</span><span class="p">,</span> <span class="n">b</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">rand</span><span class="p">(</span><span class="mi">3</span><span class="p">)</span>
+        <span class="k">return</span> <span class="p">(</span><span class="n">r</span><span class="p">,</span> <span class="n">g</span><span class="p">,</span> <span class="n">b</span><span class="p">)</span>
+
+<span class="c1"># === Properties ===</span>
+    <span class="nd">@property</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">directory</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        str: Work directory from which AGDD files are loaded.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_directory</span>
+    
+    <span class="nd">@property</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">trash_treshold</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        int: Minimum number of points for a valid fragment.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_trash_treshold</span>
+    
+    <span class="nd">@property</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">agdd_files</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        List[str]: List of AGDD file paths.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_agdd_files</span>
+    
+    <span class="nd">@property</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">fragments</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="n">List</span><span class="p">[</span><span class="s1">&#39;Fragment&#39;</span><span class="p">]]:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        List[List[Fragment]]: All detected fragments by iteration.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_fragments</span>
+    
+    <span class="nd">@property</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">iterations_nb</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        int: Number of AGDD files processed.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_iterations_nb</span></div>
+
+    
+<span class="c1"># =============================================================================</span>
+<span class="c1"># CLASS Fragment</span>
+<span class="c1"># =============================================================================</span>
+<div class="viewcode-block" id="Fragment">
+<a class="viewcode-back" href="../../api.html#crispy.Fragment">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">Fragment</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span>
+        <span class="n">ID</span><span class="p">:</span><span class="nb">int</span><span class="p">,</span>
+        <span class="n">nodeIDs</span><span class="p">:</span><span class="nb">list</span><span class="p">,</span>
+        <span class="n">nodes</span><span class="p">:</span><span class="nb">list</span><span class="p">,</span>
+        <span class="n">bondIDs</span><span class="p">:</span><span class="nb">list</span><span class="p">,</span>
+        <span class="n">bonds</span><span class="p">:</span><span class="nb">list</span><span class="p">,</span>
+        <span class="n">iteration</span><span class="p">:</span><span class="nb">int</span><span class="p">,</span>
+        <span class="n">parentIDs</span><span class="p">:</span><span class="nb">list</span><span class="p">,</span>
+        <span class="n">area</span><span class="p">:</span><span class="nb">float</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Represents a fragment detected in the simulation.</span>
+<span class="sd">        </span>
+<span class="sd">        Args:</span>
+<span class="sd">            ID (int): Unique identifier for the fragment.</span>
+<span class="sd">            nodeIDs (np.ndarray[int]): Indices of the nodes that belong to this fragment.</span>
+<span class="sd">            nodes (np.ndarray[float]): Node data (e.g., coordinates and radii).</span>
+<span class="sd">            bondIDs (np.ndarray[int]): Indices of the bonds associated with this fragment.</span>
+<span class="sd">            bonds (np.ndarray[int]): Bond data (e.g., node pairs forming bonds).</span>
+<span class="sd">            iteration (int): Iteration number when this fragment was detected.</span>
+<span class="sd">            parentIDs (List[int]): List of fragment IDs from the previous iteration that contributed to this one.</span>
+<span class="sd">            area (float): Percentage of the total area covered by this fragment.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_ID</span> <span class="o">=</span> <span class="n">ID</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_nodeIDs</span> <span class="o">=</span> <span class="n">nodeIDs</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_nodes</span> <span class="o">=</span> <span class="n">nodes</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_bondIDs</span> <span class="o">=</span> <span class="n">bondIDs</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_bonds</span> <span class="o">=</span> <span class="n">bonds</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_iteration</span> <span class="o">=</span> <span class="n">iteration</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_parentIDs</span> <span class="o">=</span> <span class="n">parentIDs</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_area</span> <span class="o">=</span> <span class="n">area</span>
+        
+<span class="c1"># === Core methods ===</span>
+<div class="viewcode-block" id="Fragment.detect_from_agdd">
+<a class="viewcode-back" href="../../api.html#crispy.Fragment.detect_from_agdd">[docs]</a>
+    <span class="nd">@classmethod</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">detect_from_agdd</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span>
+         <span class="n">detector</span><span class="p">:</span><span class="s1">&#39;FragmentDetector&#39;</span><span class="p">,</span>
+         <span class="n">agdd_file</span><span class="p">:</span><span class="nb">str</span><span class="p">,</span>
+         <span class="n">iteration</span><span class="p">:</span><span class="nb">int</span><span class="p">,</span>
+         <span class="n">trash_treshold</span><span class="p">:</span><span class="nb">int</span>
+         <span class="p">)</span><span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="s1">&#39;Fragment&#39;</span><span class="p">]:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Detects fragments from a given AGDD file.</span>
+<span class="sd">    </span>
+<span class="sd">        Args:</span>
+<span class="sd">            detector (FragmentDetector): The main detector instance containing fragment and configuration data.</span>
+<span class="sd">            agdd_file (str): Path to the AGDD file to process.</span>
+<span class="sd">            iteration (int): Index of the current iteration (frame).</span>
+<span class="sd">            trash_treshold (int): Minimum number of points required to consider a group as a valid fragment.</span>
+<span class="sd">    </span>
+<span class="sd">        Returns:</span>
+<span class="sd">            List[Fragment]: A list of detected `Fragment` instances for the given iteration.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">nodes_nb</span><span class="p">,</span> <span class="n">bonds_nb</span><span class="p">,</span> <span class="n">nodes_all</span><span class="p">,</span> <span class="n">bonds_all</span> <span class="o">=</span> <span class="bp">cls</span><span class="o">.</span><span class="n">_read_agdd</span><span class="p">(</span><span class="n">agdd_file</span><span class="p">)</span>
+        <span class="n">connectivity</span> <span class="o">=</span> <span class="bp">cls</span><span class="o">.</span><span class="n">_compute_connectivity</span><span class="p">(</span><span class="n">nodes_nb</span><span class="p">,</span> <span class="n">bonds_all</span><span class="p">)</span>
+        <span class="n">fragments</span> <span class="o">=</span> <span class="bp">cls</span><span class="o">.</span><span class="n">_identify_fragments</span><span class="p">(</span><span class="n">detector</span><span class="p">,</span> <span class="n">connectivity</span><span class="p">,</span> <span class="n">nodes_all</span><span class="p">,</span> <span class="n">bonds_all</span><span class="p">,</span> <span class="n">iteration</span><span class="p">,</span> <span class="n">trash_treshold</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">fragments</span></div>
+
+    
+<span class="c1"># === Internal helpers ===</span>
+    <span class="nd">@staticmethod</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_read_agdd</span><span class="p">(</span>
+        <span class="n">agdd_file</span><span class="p">:</span><span class="nb">str</span>
+        <span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">tuple</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Extract data from an AGDD file.</span>
+<span class="sd">    </span>
+<span class="sd">        Args:</span>
+<span class="sd">            agdd_file (str): Path to the AGDD file.</span>
+<span class="sd">    </span>
+<span class="sd">        Returns:</span>
+<span class="sd">            tuple: A tuple containing:</span>
+<span class="sd">                - nodes_nb (int): Number of nodes.</span>
+<span class="sd">                - bonds_nb (int): Number of bonds.</span>
+<span class="sd">                - nodes_all (np.ndarray): Array of node coordinates.</span>
+<span class="sd">                - bonds_all (np.ndarray): Array of bond connections.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">file</span> <span class="o">=</span> <span class="nb">open</span><span class="p">(</span><span class="n">agdd_file</span><span class="p">,</span> <span class="s2">&quot;r&quot;</span><span class="p">)</span>
+        <span class="n">lines</span> <span class="o">=</span> <span class="n">file</span><span class="o">.</span><span class="n">readlines</span><span class="p">()</span>
+        <span class="n">file</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+        
+        <span class="n">nodes_nb</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">lines</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+        <span class="n">bonds_nb</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">lines</span><span class="p">[</span><span class="n">nodes_nb</span> <span class="o">+</span> <span class="mi">1</span><span class="p">])</span>
+        
+        <span class="n">nodes_all</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="nb">list</span><span class="p">(</span><span class="nb">map</span><span class="p">(</span><span class="nb">float</span><span class="p">,</span> <span class="n">line</span><span class="o">.</span><span class="n">split</span><span class="p">()))</span> <span class="k">for</span> <span class="n">line</span> <span class="ow">in</span> <span class="n">lines</span><span class="p">[</span><span class="mi">1</span><span class="p">:</span><span class="n">nodes_nb</span> <span class="o">+</span> <span class="mi">1</span><span class="p">]])</span>
+        <span class="n">bonds_all</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="nb">list</span><span class="p">(</span><span class="nb">map</span><span class="p">(</span><span class="nb">int</span><span class="p">,</span> <span class="n">line</span><span class="o">.</span><span class="n">split</span><span class="p">()))</span> <span class="k">for</span> <span class="n">line</span> <span class="ow">in</span> <span class="n">lines</span><span class="p">[</span><span class="n">nodes_nb</span> <span class="o">+</span> <span class="mi">2</span><span class="p">:</span><span class="n">nodes_nb</span> <span class="o">+</span> <span class="mi">2</span> <span class="o">+</span> <span class="n">bonds_nb</span><span class="p">]])</span>
+        <span class="k">return</span> <span class="n">nodes_nb</span><span class="p">,</span> <span class="n">bonds_nb</span><span class="p">,</span> <span class="n">nodes_all</span><span class="p">,</span> <span class="n">bonds_all</span>
+    
+    <span class="nd">@staticmethod</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_compute_connectivity</span><span class="p">(</span>
+        <span class="n">nodes_nb</span><span class="p">:</span><span class="nb">int</span><span class="p">,</span>
+        <span class="n">bonds_all</span><span class="p">:</span><span class="nb">list</span>
+        <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">csr_matrix</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Creates a symmetric node connectivity matrix from bond data.</span>
+<span class="sd">    </span>
+<span class="sd">        Args:</span>
+<span class="sd">            nodes_nb (int): Total number of nodes.</span>
+<span class="sd">            bonds_all (List[List[int]]): List of bonds, each represented as a pair of connected node indices.</span>
+<span class="sd">    </span>
+<span class="sd">        Returns:</span>
+<span class="sd">            csr_matrix: A sparse adjacency matrix (Compressed Sparse Row format) representing node connectivity.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">connectivity</span> <span class="o">=</span> <span class="n">lil_matrix</span><span class="p">((</span><span class="n">nodes_nb</span><span class="p">,</span> <span class="n">nodes_nb</span><span class="p">),</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">int</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">j</span> <span class="ow">in</span> <span class="n">bonds_all</span><span class="p">:</span>
+            <span class="n">connectivity</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="n">j</span><span class="p">]</span> <span class="o">=</span> <span class="mi">1</span>
+            <span class="n">connectivity</span><span class="p">[</span><span class="n">j</span><span class="p">,</span> <span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="mi">1</span>
+        <span class="k">return</span> <span class="n">connectivity</span><span class="o">.</span><span class="n">tocsr</span><span class="p">()</span>
+    
+    <span class="k">def</span><span class="w"> </span><span class="nf">_identify_fragments</span><span class="p">(</span>
+        <span class="n">detector</span><span class="p">:</span><span class="s1">&#39;FragmentDetector&#39;</span><span class="p">,</span>
+        <span class="n">connectivity</span><span class="p">:</span><span class="n">csr_matrix</span><span class="p">,</span>
+        <span class="n">nodes_all</span><span class="p">:</span><span class="nb">list</span><span class="p">,</span>
+        <span class="n">bonds_all</span><span class="p">:</span><span class="nb">list</span><span class="p">,</span>
+        <span class="n">iteration</span><span class="p">:</span><span class="nb">int</span><span class="p">,</span>
+        <span class="n">trash_treshold</span><span class="p">:</span><span class="nb">int</span>
+        <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="s1">&#39;Fragment&#39;</span><span class="p">]:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Identifies fragments from a connectivity graph of nodes and bonds.</span>
+<span class="sd">    </span>
+<span class="sd">        Args:</span>
+<span class="sd">            detector (FragmentDetector): The main detector instance containing prior fragment data.</span>
+<span class="sd">            connectivity (csr_matrix): Sparse adjacency matrix representing node connectivity.</span>
+<span class="sd">            nodes_all (List[List[float]]): All nodes, including coordinates and radii.</span>
+<span class="sd">            bonds_all (List[List[int]]): All bonds, defined by pairs of connected node indices.</span>
+<span class="sd">            iteration (int): The current iteration index.</span>
+<span class="sd">            trash_treshold (int): Minimum number of nodes required for a fragment to be considered valid.</span>
+<span class="sd">    </span>
+<span class="sd">        Returns:</span>
+<span class="sd">            List[Fragment]: A list of `Fragment` objects, including valid fragments and possibly a trash fragment.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c1"># initialize fragment list</span>
+        <span class="n">fragments</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="n">fragmentIDs</span> <span class="o">=</span> <span class="p">[]</span>
+        
+        <span class="c1"># get previous fragments</span>
+        <span class="n">fragments_previous</span> <span class="o">=</span> <span class="n">detector</span><span class="o">.</span><span class="n">_get_fragments_by_iteration_safe</span><span class="p">(</span><span class="n">iteration</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)</span>
+        
+        <span class="c1"># compute area_all</span>
+        <span class="n">area_all</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">pi</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">nodes_all</span><span class="p">[:,</span> <span class="mi">3</span><span class="p">]</span> <span class="o">**</span> <span class="mf">2.</span><span class="p">)</span>
+        
+        <span class="c1"># compute fragments</span>
+        <span class="n">fragments_nb</span><span class="p">,</span> <span class="n">nodes_label_all</span> <span class="o">=</span> <span class="n">connected_components</span><span class="p">(</span><span class="n">connectivity</span><span class="p">,</span> <span class="n">directed</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+        
+        <span class="c1"># fragments labels and nodes : divide by trash_treshold size</span>
+        <span class="n">labels_and_nodeIDs_all</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">empty</span><span class="p">((</span><span class="n">fragments_nb</span><span class="p">,</span> <span class="mi">2</span><span class="p">),</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">object</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">fragments_nb</span><span class="p">):</span>
+            <span class="n">labels_and_nodeIDs_all</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="n">i</span>
+            <span class="n">labels_and_nodeIDs_all</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">nodes_label_all</span> <span class="o">==</span> <span class="n">i</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
+            
+        <span class="n">labels_and_nodeIDs_trash</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="n">f</span> <span class="k">for</span> <span class="n">f</span> <span class="ow">in</span> <span class="n">labels_and_nodeIDs_all</span> <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">f</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span> <span class="o">&lt;=</span> <span class="n">trash_treshold</span><span class="p">])</span>
+        <span class="n">labels_and_nodeIDs_fragments</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="n">f</span> <span class="k">for</span> <span class="n">f</span> <span class="ow">in</span> <span class="n">labels_and_nodeIDs_all</span> <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">f</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span> <span class="o">&gt;</span> <span class="n">trash_treshold</span><span class="p">])</span>
+        
+        <span class="c1"># compute trash</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">labels_and_nodeIDs_trash</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="c1"># get nodes</span>
+            <span class="n">nodeIDs_trash</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">concatenate</span><span class="p">(</span><span class="n">labels_and_nodeIDs_trash</span><span class="p">[:,</span> <span class="mi">1</span><span class="p">])</span>
+            <span class="n">nodes_trash</span> <span class="o">=</span> <span class="n">nodes_all</span><span class="p">[</span><span class="n">nodeIDs_trash</span><span class="p">]</span>
+            
+            <span class="c1"># get bonds</span>
+            <span class="n">mask</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">isin</span><span class="p">(</span><span class="n">bonds_all</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">],</span> <span class="n">nodeIDs_trash</span><span class="p">)</span> <span class="o">|</span> <span class="n">np</span><span class="o">.</span><span class="n">isin</span><span class="p">(</span><span class="n">bonds_all</span><span class="p">[:,</span> <span class="mi">1</span><span class="p">],</span> <span class="n">nodeIDs_trash</span><span class="p">)</span>
+            <span class="n">bondIDs_trash</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">mask</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
+            <span class="n">bonds_trash</span> <span class="o">=</span> <span class="n">bonds_all</span><span class="p">[</span><span class="n">bondIDs_trash</span><span class="p">]</span>
+            
+            <span class="c1"># get parentIDs</span>
+            <span class="n">parentIDs_trash</span> <span class="o">=</span> <span class="p">[]</span>
+            <span class="k">for</span> <span class="n">fragment</span> <span class="ow">in</span> <span class="n">fragments_previous</span><span class="p">:</span>
+                <span class="k">if</span> <span class="n">fragment</span><span class="o">.</span><span class="n">ID</span> <span class="o">!=</span> <span class="o">-</span><span class="mi">1</span><span class="p">:</span>
+                    <span class="n">mask</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">isin</span><span class="p">(</span><span class="n">nodeIDs_trash</span><span class="p">,</span> <span class="n">fragment</span><span class="o">.</span><span class="n">nodeIDs</span><span class="p">)</span>
+                    <span class="k">if</span> <span class="n">np</span><span class="o">.</span><span class="n">any</span><span class="p">(</span><span class="n">mask</span><span class="p">):</span>
+                        <span class="n">parentIDs_trash</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">fragment</span><span class="o">.</span><span class="n">ID</span><span class="p">)</span>
+            
+            <span class="c1"># compute area partition</span>
+            <span class="n">area_trash</span> <span class="o">=</span> <span class="mf">100.</span> <span class="o">*</span> <span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">pi</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">nodes_trash</span><span class="p">[:,</span> <span class="mi">3</span><span class="p">]</span> <span class="o">**</span> <span class="mf">2.</span><span class="p">))</span> <span class="o">/</span> <span class="n">area_all</span>
+
+            <span class="c1"># create fragment</span>
+            <span class="n">fragments</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">Fragment</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="n">nodeIDs_trash</span><span class="p">,</span> <span class="n">nodes_trash</span><span class="p">,</span> <span class="n">bondIDs_trash</span><span class="p">,</span> <span class="n">bonds_trash</span><span class="p">,</span> <span class="n">iteration</span><span class="p">,</span> <span class="nb">sorted</span><span class="p">(</span><span class="n">parentIDs_trash</span><span class="p">),</span> <span class="n">area_trash</span><span class="p">))</span>
+
+        <span class="c1"># compute fragments</span>
+        <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">labels_and_nodeIDs</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">labels_and_nodeIDs_fragments</span><span class="p">):</span>
+            <span class="c1"># get nodes</span>
+            <span class="n">nodeIDs_fragment</span> <span class="o">=</span> <span class="n">labels_and_nodeIDs_fragments</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="mi">1</span><span class="p">]</span>
+            <span class="n">nodes_fragment</span> <span class="o">=</span> <span class="n">nodes_all</span><span class="p">[</span><span class="n">nodeIDs_fragment</span><span class="p">]</span>
+            
+            <span class="c1"># get bonds</span>
+            <span class="n">mask</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">isin</span><span class="p">(</span><span class="n">bonds_all</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">],</span> <span class="n">nodeIDs_fragment</span><span class="p">)</span> <span class="o">|</span> <span class="n">np</span><span class="o">.</span><span class="n">isin</span><span class="p">(</span><span class="n">bonds_all</span><span class="p">[:,</span> <span class="mi">1</span><span class="p">],</span> <span class="n">nodeIDs_fragment</span><span class="p">)</span>
+            <span class="n">bondIDs_fragment</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">mask</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
+            <span class="n">bonds_fragment</span> <span class="o">=</span> <span class="n">bonds_all</span><span class="p">[</span><span class="n">bondIDs_fragment</span><span class="p">]</span>
+            
+            <span class="c1"># get parents</span>
+            <span class="n">parentIDs_fragment</span> <span class="o">=</span> <span class="p">[]</span>
+            <span class="k">if</span> <span class="n">iteration</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+                <span class="k">for</span> <span class="n">fragment</span> <span class="ow">in</span> <span class="n">fragments_previous</span><span class="p">:</span>
+                    <span class="k">if</span> <span class="n">nodeIDs_fragment</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="ow">in</span> <span class="n">fragment</span><span class="o">.</span><span class="n">nodeIDs</span><span class="p">:</span>
+                        <span class="n">parentIDs_fragment</span> <span class="o">=</span> <span class="p">[</span><span class="n">fragment</span><span class="o">.</span><span class="n">ID</span><span class="p">]</span>
+                        <span class="k">continue</span>
+
+            <span class="c1"># get ID</span>
+            <span class="n">ID_fragment</span> <span class="o">=</span> <span class="n">nodeIDs_fragment</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+            <span class="k">if</span> <span class="n">iteration</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+                <span class="k">if</span> <span class="n">parentIDs_fragment</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">fragmentIDs</span><span class="p">:</span>
+                    <span class="n">ID_fragment</span> <span class="o">=</span> <span class="n">parentIDs_fragment</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="n">ID_fragment</span> <span class="o">=</span> <span class="n">nodeIDs_fragment</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+            
+            <span class="c1"># compute area partition</span>
+            <span class="n">area_fragment</span> <span class="o">=</span> <span class="mf">100.</span> <span class="o">*</span> <span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">pi</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">nodes_fragment</span><span class="p">[:,</span> <span class="mi">3</span><span class="p">]</span> <span class="o">**</span> <span class="mf">2.</span><span class="p">))</span> <span class="o">/</span> <span class="n">area_all</span>
+            
+            <span class="c1"># create fragments list</span>
+            <span class="n">fragments</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">Fragment</span><span class="p">(</span><span class="n">ID_fragment</span><span class="p">,</span> <span class="n">nodeIDs_fragment</span><span class="p">,</span> <span class="n">nodes_fragment</span><span class="p">,</span> <span class="n">bondIDs_fragment</span><span class="p">,</span> <span class="n">bonds_fragment</span><span class="p">,</span> <span class="n">iteration</span><span class="p">,</span> <span class="nb">sorted</span><span class="p">(</span><span class="n">parentIDs_fragment</span><span class="p">),</span> <span class="n">area_fragment</span><span class="p">))</span>
+            <span class="n">fragmentIDs</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">ID_fragment</span><span class="p">)</span>
+        
+        <span class="k">return</span> <span class="n">fragments</span>
+
+<span class="c1"># === Properties ===</span>
+    <span class="nd">@property</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">ID</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        int: Unique identifier of the fragment.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_ID</span>
+    
+    <span class="nd">@property</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">nodeIDs</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">[</span><span class="nb">int</span><span class="p">]:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        np.ndarray[int]: Indices of the nodes that belong to the fragment.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_nodeIDs</span>
+    
+    <span class="nd">@property</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">nodes</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">[</span><span class="nb">float</span><span class="p">]:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        np.ndarray[float]: Array containing the coordinates and radii of the fragment&#39;s nodes.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_nodes</span>
+    
+    <span class="nd">@property</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">bondIDs</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">[</span><span class="nb">int</span><span class="p">]:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        np.ndarray[int]: Indices of the bonds associated with the fragment.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_bondIDs</span>
+    
+    <span class="nd">@property</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">bonds</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">[</span><span class="nb">int</span><span class="p">]:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        np.ndarray[int]: Array of node connections (bonds) within the fragment.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_bonds</span>
+    
+    <span class="nd">@property</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">iteration</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        int: Iteration number at which the fragment is detected.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_iteration</span>
+    
+    <span class="nd">@property</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">parentIDs</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="nb">int</span><span class="p">]:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        List[int]: IDs of parent fragments from the previous iteration.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_parentIDs</span>
+    
+    <span class="nd">@property</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">area</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        float: Percentage of the total area occupied by the fragment.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_area</span></div>
+
+    
+    
+
+    
+    
+<span class="c1"># =============================================================================</span>
+<span class="c1"># MAIN</span>
+<span class="c1"># =============================================================================</span>
+<span class="c1"># sim = Crispy([&quot;../examples/agdd/domain-0000000004000.agdd&quot;, &quot;../examples/agdd/domain-0000000005000.agdd&quot;])</span>
+<span class="c1"># sim = Crispy(&quot;../examples/agdd/&quot;)</span>
+<span class="c1"># sim.build_fragments()</span>
+<span class="c1"># # sim.plot3D()</span>
+<span class="c1"># sim.save()</span>
+
+<span class="c1"># # save= True</span>
+<span class="c1"># # for i in range(sim.iterations_nb):</span>
+<span class="c1"># #     sim.plot2D(iteration=i, save = save)</span>
+
+<span class="c1"># # sim.stackplot()</span>
+<span class="c1"># # sim.graphplot()</span>
+
+<span class="c1"># sim.viewer3D()</span>
+
+
+
+
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2025, L. Brémaud, J. Girardot.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>
