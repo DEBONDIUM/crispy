@@ -15,7 +15,7 @@ copyright = '2025, L. Brémaud, J. Girardot'
 author = 'L. Brémaud, J. Girardot'
 release = '0.1'
 
-html_logo = "_static/logoII.png"
+html_logo = "_static/logo_gimpII.png"
 #html_favicon = "_static/favicon.ico"
 
 # -- General configuration ---------------------------------------------------

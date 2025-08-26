@@ -22,7 +22,7 @@ detector.build_fragments()
 
 # 2D plot at each iteration
 for it in range(detector.iterations_nb):
-    detector.plot2D(iteration=it)
+    detector.plot2D(iteration=it, save=True, save_format="eps")
 
 # Stack plot: repartition of area
 detector.stackplot()

@@ -329,7 +329,7 @@ class FragmentDetector:
             if ID != -1:
                 ax.scatter(nodes[:, 0], nodes[:, 1], s=dot_size, c=[self._random_color_ID(ID)])
                 centroid = np.mean(nodes, axis=0)
-                ax.text(centroid[0], centroid[1], f"{ID}", color='k', fontsize=10, weight='bold', clip_on=True)
+                #ax.text(centroid[0], centroid[1], f"{ID}", color='k', fontsize=10, weight='bold', clip_on=True)
                 
                 if show_bonds:
                     for bond in bonds:
@@ -359,7 +359,7 @@ class FragmentDetector:
         if save:
             os.makedirs(os.path.join(self._directory, 'img'), exist_ok=True)
             filename = os.path.join(self._directory, 'img', f"plot2D_iteration{iteration}.{save_format}")
-            plt.savefig(filename, format=save_format)
+            plt.savefig(filename, format=save_format, transparent=True)
         if auto_close:
             plt.close(fig)
     
@@ -854,28 +854,7 @@ class Fragment:
         float: Percentage of the total area occupied by the fragment.
         """
         return self._area
-    
-    
 
-    
-    
-# =============================================================================
-# MAIN
-# =============================================================================
-# sim = Crispy(["../examples/agdd/domain-0000000004000.agdd", "../examples/agdd/domain-0000000005000.agdd"])
-# sim = Crispy("../examples/agdd/")
-# sim.build_fragments()
-# # sim.plot3D()
-# sim.save()
-
-# # save= True
-# # for i in range(sim.iterations_nb):
-# #     sim.plot2D(iteration=i, save = save)
-
-# # sim.stackplot()
-# # sim.graphplot()
-
-# sim.viewer3D()
 
 
 
