@@ -1,7 +1,7 @@
 # Crispy
-# 🧩 Crispy – Fragmentation Analysis in Solid Mechanics
+# 🧩 Crispy – Fragments Analysis in Solid Mechanics
 
-**Crispy** is a lightweight Python library designed to **identify, count, and analyze fragments** generated in **discrete solid mechanics simulations**. Whether you're working on dynamic fracture, debris tracking, or material rupture, `crispy` provides simple and robust tools to extract meaningful metrics from your numerical data.
+**Crispy** is a lightweight Python library designed to **identify, count, and analyze fragments** generated in **particule-based simulations**. Whether you're working on dynamic fracture, debris tracking, or material fragmentation, `crispy` provides simple and robust tools to extract meaningful metrics from your numerical data.
 
 > 💥 From breakage to data — fast, clear, and **crispy**.
 
@@ -11,7 +11,7 @@
 
 - 🔍 Detect and label fragments from discrete simulation outputs
 - 📊 Compute fragment size distributions and statistics
-- 🧱 Support for 2D and 3D domains (structured or unstructured)
+- 🧱 Support for 2D and 3D domains (nodal position and connectivity)
 - 🧮 Works with numpy arrays, mesh files, or custom simulation outputs
 - 🧰 Minimal dependencies, easy to integrate into existing workflows
 
