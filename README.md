@@ -39,7 +39,7 @@ pip install .
 ```python
 import crispy as cp
 
-detector = cp.FragmentDetector("path/to/agdd/files")
+detector = cp.FragmentDetector("path/to/mesh/files")
 detector.build_fragments()
 
 for i in range(detector.iterations_nb):
