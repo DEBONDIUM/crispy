@@ -39,11 +39,13 @@ pip install .
 ```python
 import crispy as cp
 
-detector = cp.FragmentDetector("path/to/agdd/files")
-detector.build_fragments()
+files = cp.load_files("files/", extension="agdd")
 
-for i in range(detector.iterations_nb):
-    detector.plot2D(iteration=i, save=True)
+fragments_history = cp.detect_fragment(files)
+
+cp.stackplot(fragments_history)
+
+cp.plot(fragments_history[9])
 ```
 
 More examples are available in the [`examples/`](examples/) folder and in the [documentation](https://debondium.github.io/crispy).
@@ -71,7 +73,7 @@ The full documentation (installation, API reference, usage examples) is availabl
 
 - [Numpy](https://numpy.org)  
 - [Scipy](https://scipy.org)  
-- [Open3d](http://www.open3d.org)  
+- [PyVista](http://www.pyvista.org)  
 - [Matplotlib](https://matplotlib.org)
 
 ---
