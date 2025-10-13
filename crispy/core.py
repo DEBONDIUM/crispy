@@ -1,11 +1,3 @@
-#!/usr/bin/env python3
-# -*- coding: utf-8 -*-
-"""
-Created on Tue Oct  7 15:59:55 2025
-
-@author: lbremaud
-"""
-
 # =============================================================================
 # LIB
 # =============================================================================
@@ -317,7 +309,7 @@ def plot(fraglist: list[Fragment],
     show_axe : bool, optional
         Show axes. The default is False.
     auto_close : bool, optional
-        Atomatically close window plot. The default is False.
+        Automatically close window plot. The default is False.
     save : bool, optional
         Save option. The default is True.
     filename : str

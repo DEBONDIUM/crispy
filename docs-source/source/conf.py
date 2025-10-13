@@ -10,12 +10,13 @@ sys.path.insert(0, str(Path(__file__).resolve().parents[2]))
 # -- Project information -----------------------------------------------------
 # https://www.sphinx-doc.org/en/master/usage/configuration.html#project-information
 
-project = 'Crispy'
+project = 'CRISPY'
 copyright = '2025, L. Brémaud, J. Girardot'
 author = 'L. Brémaud, J. Girardot'
-release = '0.1'
+release = '0.2.0'
+version = '0.2'
 
-html_logo = "_static/logo_gimpII.png"
+html_logo = "_static/logo_crispy.png"
 #html_favicon = "_static/favicon.ico"
 
 # -- General configuration ---------------------------------------------------
@@ -51,7 +52,9 @@ autodoc_member_order = 'bysource'
 html_theme_options = {
     'collapse_navigation': True,
     'navigation_depth': 3,
-    'titles_only': False
+    'titles_only': False,
+    'flyout_display': 'attached',
+    'version_selector': True
 }
 
 pygments_style = 'sphinx'  # Options: 'default', 'sphinx', 'friendly', 'monokai', etc.

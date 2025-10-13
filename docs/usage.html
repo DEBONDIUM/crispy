@@ -6,7 +6,7 @@
   <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Quick Start &mdash; Crispy 0.1 documentation</title>
+  <title>Quick Start &mdash; CRISPY 0.2.0 documentation</title>
       <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=03e43079" />
       <link rel="stylesheet" type="text/css" href="_static/css/theme.css?v=e59714d7" />
       <link rel="stylesheet" type="text/css" href="_static/custom.css?v=cb9177a2" />
@@ -14,7 +14,7 @@
   
       <script src="_static/jquery.js?v=5d32c60e"></script>
       <script src="_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-      <script src="_static/documentation_options.js?v=2709fde1"></script>
+      <script src="_static/documentation_options.js?v=938c9ccc"></script>
       <script src="_static/doctools.js?v=9bcbadda"></script>
       <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="_static/js/theme.js"></script>
@@ -33,8 +33,8 @@
           
           
           <a href="index.html" class="icon icon-home">
-            Crispy
-              <img src="_static/logo_gimpII.png" class="logo" alt="Logo"/>
+            CRISPY
+              <img src="_static/logo_crispy.png" class="logo" alt="Logo"/>
           </a>
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
@@ -50,7 +50,7 @@
 <li class="toctree-l1"><a class="reference internal" href="installation.html">Installation</a></li>
 <li class="toctree-l1 current"><a class="current reference internal" href="#">Quick Start</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="#getting-started">Getting Started</a></li>
-<li class="toctree-l2"><a class="reference internal" href="#agdd-file-format">AGDD File Format</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#input-file-format">Input File Format</a></li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="api.html">API Reference</a></li>
@@ -63,7 +63,7 @@
 
     <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
           <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
-          <a href="index.html">Crispy</a>
+          <a href="index.html">CRISPY</a>
       </nav>
 
       <div class="wy-nav-content">
@@ -85,23 +85,28 @@
 <span id="usage"></span><h1>Quick Start<a class="headerlink" href="#quick-start" title="Link to this heading"></a></h1>
 <section id="getting-started">
 <h2>Getting Started<a class="headerlink" href="#getting-started" title="Link to this heading"></a></h2>
-<p>To begin using Crispy, import the library and initialize a fragment detector:</p>
+<p>To begin using Crispy, import the library:</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">crispy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">cp</span>
-
-<span class="n">detector</span> <span class="o">=</span> <span class="n">cp</span><span class="o">.</span><span class="n">FragmentDetector</span><span class="p">(</span><span class="s2">&quot;path/to/files&quot;</span><span class="p">)</span>
-<span class="n">detector</span><span class="o">.</span><span class="n">build_fragments</span><span class="p">()</span>
+</pre></div>
+</div>
+<p>Then load input files from a specified directory:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">files</span> <span class="o">=</span> <span class="n">cp</span><span class="o">.</span><span class="n">load_files</span><span class="p">(</span><span class="s2">&quot;input_files/&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>Then launch the fragment detection:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">fragments_history</span> <span class="o">=</span> <span class="n">cp</span><span class="o">.</span><span class="n">detect_fragment</span><span class="p">(</span><span class="n">files</span><span class="p">)</span>
 </pre></div>
 </div>
 </section>
-<section id="agdd-file-format">
-<h2>AGDD File Format<a class="headerlink" href="#agdd-file-format" title="Link to this heading"></a></h2>
-<p>Crispy operates on <cite>.agdd</cite> files, which contain structured data describing discrete domain properties such as nodes and bonds.</p>
-<p>A typical <cite>.agdd</cite> file looks like this:</p>
-<div class="highlight-text notranslate"><div class="highlight"><pre><span></span># Example AGDD file
-1000 # Number of nodes (Pos X / Pos Y / Pos Z / Radius)
-0.   0.      0.      0.5
-1.   1.      1.      0.6
-2.   2.      2.      0.4
+<section id="input-file-format">
+<h2>Input File Format<a class="headerlink" href="#input-file-format" title="Link to this heading"></a></h2>
+<p>Crispy operates on all type of files, as long as they contain structured data describing discrete domain properties such as nodes and bonds.</p>
+<p>A typical input file should be structured like this:</p>
+<div class="highlight-text notranslate"><div class="highlight"><pre><span></span># Example input file
+1000 # Number of nodes (Pos X / Pos Y / Pos Z)
+0.   0.      0.
+1.   1.      1.
+2.   2.      2.
 ...
 5000 # Number of bonds (Node 1 / Node 2)
 0    1
@@ -110,7 +115,7 @@
 ...
 </pre></div>
 </div>
-<p>Make sure all <cite>.agdd</cite> files in your directory follow a consistent structure.</p>
+<p>Make sure all input files in your directory follow a consistent structure.</p>
 </section>
 </section>
 

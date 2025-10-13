@@ -18,5 +18,6 @@ fragments_history = cp.detect_fragment(files)
 # stackplot
 cp.stackplot(fragments_history, save=False)
 
-# plot fragments at iteration 10
-cp.plot(fragments_history[9], save=False)
+# plot fragments for all iterations
+for it in fragments_history.keys():
+    cp.plot(fragments_history[it], filename=f"plot2D_it{it}")

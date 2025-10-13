@@ -6,7 +6,7 @@
   <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Examples &mdash; Crispy 0.1 documentation</title>
+  <title>Examples &mdash; CRISPY 0.2.0 documentation</title>
       <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=03e43079" />
       <link rel="stylesheet" type="text/css" href="_static/css/theme.css?v=e59714d7" />
       <link rel="stylesheet" type="text/css" href="_static/custom.css?v=cb9177a2" />
@@ -14,7 +14,7 @@
   
       <script src="_static/jquery.js?v=5d32c60e"></script>
       <script src="_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-      <script src="_static/documentation_options.js?v=2709fde1"></script>
+      <script src="_static/documentation_options.js?v=938c9ccc"></script>
       <script src="_static/doctools.js?v=9bcbadda"></script>
       <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="_static/js/theme.js"></script>
@@ -32,8 +32,8 @@
           
           
           <a href="index.html" class="icon icon-home">
-            Crispy
-              <img src="_static/logo_gimpII.png" class="logo" alt="Logo"/>
+            CRISPY
+              <img src="_static/logo_crispy.png" class="logo" alt="Logo"/>
           </a>
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
@@ -67,7 +67,7 @@
 
     <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
           <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
-          <a href="index.html">Crispy</a>
+          <a href="index.html">CRISPY</a>
       </nav>
 
       <div class="wy-nav-content">
@@ -89,23 +89,27 @@
 <span id="id1"></span><h1>Examples<a class="headerlink" href="#examples" title="Link to this heading"></a></h1>
 <section id="d-fragmentation-example">
 <h2>2D Fragmentation Example<a class="headerlink" href="#d-fragmentation-example" title="Link to this heading"></a></h2>
-<p>This example demonstrates how to use <strong>Crispy</strong> to load a set of <cite>.agdd</cite> files obtained from a <a class="reference external" href="https://www.granoo.org/">GranOO</a> simulation of 2D disc impact and visualize fragmentation over time.</p>
+<p>This example demonstrates how to use <strong>Crispy</strong> to load a set of files obtained from a <a class="reference external" href="https://www.granoo.org/">GranOO</a> simulation of 2D disc impact and visualize fragmentation over time.</p>
 <section id="code-example">
 <h3>Code Example<a class="headerlink" href="#code-example" title="Link to this heading"></a></h3>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">crispy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">cp</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># load files</span>
+<span class="n">files</span> <span class="o">=</span> <span class="n">cp</span><span class="o">.</span><span class="n">load_files</span><span class="p">(</span><span class="s2">&quot;files/&quot;</span><span class="p">,</span> <span class="n">extension</span><span class="o">=</span><span class="s2">&quot;agdd&quot;</span><span class="p">)</span>
 
-<span class="n">detector</span> <span class="o">=</span> <span class="n">cp</span><span class="o">.</span><span class="n">FragmentDetector</span><span class="p">(</span><span class="s2">&quot;path/to/your/agdd/files&quot;</span><span class="p">)</span>
-<span class="n">detector</span><span class="o">.</span><span class="n">build_fragments</span><span class="p">()</span>
+<span class="c1"># detect fragments from stacked files</span>
+<span class="n">fragments_history</span> <span class="o">=</span> <span class="n">cp</span><span class="o">.</span><span class="n">detect_fragment</span><span class="p">(</span><span class="n">files</span><span class="p">)</span>
 
-<span class="k">for</span> <span class="n">it</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">detector</span><span class="o">.</span><span class="n">iterations_nb</span><span class="p">):</span>
-    <span class="n">detector</span><span class="o">.</span><span class="n">plot2D</span><span class="p">(</span><span class="n">iteration</span><span class="o">=</span><span class="n">it</span><span class="p">)</span>
+<span class="c1"># stackplot</span>
+<span class="n">cp</span><span class="o">.</span><span class="n">stackplot</span><span class="p">(</span><span class="n">fragments_history</span><span class="p">)</span>
+
+<span class="c1"># plot fragments at iteration 10</span>
+<span class="n">cp</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">fragments_history</span><span class="p">[</span><span class="mi">9</span><span class="p">])</span>
 </pre></div>
 </div>
-<p>This will generate one 2D image per iteration in your working directory, as well as a
-stack plot of the area repartition over iterations and a graph of the fragments heredity.</p>
+<p>After loading files and detect fragments, this will generate a stack plot of the area repartition of each fragment of iteration n°10,
+as well as one plot of the fragments, colored and labelled.</p>
 <div class="admonition note">
 <p class="admonition-title">Note</p>
-<p>Make sure the work directory contains valid <cite>.agdd</cite> files, the iteration sorting process is based on filename. For <cite>.agdd</cite> format, see details in the <a class="reference internal" href="usage.html#usage"><span class="std std-ref">Quick Start</span></a> section.</p>
+<p>Make sure the work directory contains valid input files, the iteration sorting process is based on filename.</p>
 </div>
 </section>
 <section id="preview-of-generated-images">
@@ -125,7 +129,7 @@ stack plot of the area repartition over iterations and a graph of the fragments 
 python<span class="w"> </span>2D_impact.py
 </pre></div>
 </div>
-<p>This script will execute the 2D fragmentation detection and save images for each iteration of the simulation in a subfolder <code class="docutils literal notranslate"><span class="pre">examples/2D_impact/agdd/img</span></code> of the working directory.</p>
+<p>This script will execute the 2D fragmentation detection.</p>
 <div class="admonition note">
 <p class="admonition-title">Note</p>
 <p>Make sure you have installed all required dependencies listed in the <a class="reference internal" href="installation.html#installation"><span class="std std-ref">Installation</span></a> section before running the example.</p>
@@ -133,13 +137,14 @@ python<span class="w"> </span>2D_impact.py
 <p>You can inspect or modify the source code here:</p>
 <ul class="simple">
 <li><p><code class="file docutils literal notranslate"><span class="pre">examples/2D_impact/2D_impact.py</span></code></p></li>
-<li><p><cite>.agdd</cite> input files are stored in <code class="file docutils literal notranslate"><span class="pre">examples/2D_impact/agdd/</span></code></p></li>
+<li><p>input files are stored in <code class="file docutils literal notranslate"><span class="pre">examples/2D_impact/files/</span></code></p></li>
 </ul>
-<p>For more details on <cite>.agdd</cite> input file format, see the <a class="reference internal" href="usage.html#usage"><span class="std std-ref">Quick Start</span></a> section.</p>
+<p>For more details on input file format, see the <a class="reference internal" href="usage.html#usage"><span class="std std-ref">Quick Start</span></a> section.</p>
 </section>
 </section>
 <section id="id2">
 <h2>3D Fragmentation Example<a class="headerlink" href="#id2" title="Link to this heading"></a></h2>
+<p>Work in progress.</p>
 </section>
 </section>
 

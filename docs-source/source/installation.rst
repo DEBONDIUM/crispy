@@ -32,12 +32,12 @@ Crispy requires the following Python packages:
 
 - `Numpy <https://numpy.org/>`__
 - `Scipy <https://scipy.org/>`__
-- `Open3d <http://www.open3d.org/>`__
+- `PyVista <http://www.pyvista.org/>`__
 - `Matplotlib <https://matplotlib.org/>`__
 
 These are installed automatically with `pip`, but can be installed manually if needed:
 
 .. code-block:: bash
 
-   pip install numpy scipy open3d matplotlib
+   pip install numpy scipy pyvista matplotlib
 

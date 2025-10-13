@@ -6,30 +6,38 @@ Quick Start
 Getting Started
 ---------------
 
-To begin using Crispy, import the library and initialize a fragment detector:
+To begin using Crispy, import the library:
 
 .. code-block:: python
 
    import crispy as cp
 
-   detector = cp.FragmentDetector("path/to/files")
-   detector.build_fragments()
+Then load input files from a specified directory:
 
+.. code-block:: python
 
-AGDD File Format
-----------------
+   files = cp.load_files("input_files/")
 
-Crispy operates on `.agdd` files, which contain structured data describing discrete domain properties such as nodes and bonds.
+Then launch the fragment detection:
 
-A typical `.agdd` file looks like this:
+.. code-block:: python
+
+   fragments_history = cp.detect_fragment(files)
+
+Input File Format
+-----------------
+
+Crispy operates on all type of files, as long as they contain structured data describing discrete domain properties such as nodes and bonds.
+
+A typical input file should be structured like this:
 
 .. code-block:: text
 
-   # Example AGDD file
-   1000 # Number of nodes (Pos X / Pos Y / Pos Z / Radius)
-   0.	0.	0.	0.5
-   1.	1.	1.	0.6
-   2.	2.	2.	0.4
+   # Example input file
+   1000 # Number of nodes (Pos X / Pos Y / Pos Z)
+   0.	0.	0.
+   1.	1.	1.
+   2.	2.	2.
    ...
    5000 # Number of bonds (Node 1 / Node 2)
    0	1
@@ -37,6 +45,6 @@ A typical `.agdd` file looks like this:
    3	2
    ...
 
-Make sure all `.agdd` files in your directory follow a consistent structure.
+Make sure all input files in your directory follow a consistent structure.
 
 

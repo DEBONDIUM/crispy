@@ -6,27 +6,31 @@ Examples
 2D Fragmentation Example
 ------------------------
 
-This example demonstrates how to use **Crispy** to load a set of `.agdd` files obtained from a `GranOO <https://www.granoo.org/>`__ simulation of 2D disc impact and visualize fragmentation over time.
+This example demonstrates how to use **Crispy** to load a set of files obtained from a `GranOO <https://www.granoo.org/>`__ simulation of 2D disc impact and visualize fragmentation over time.
 
 Code Example
 ^^^^^^^^^^^^
 
 .. code-block:: python
 
-   import crispy as cp
+   # load files
+   files = cp.load_files("files/", extension="agdd")
 
-   detector = cp.FragmentDetector("path/to/your/agdd/files")
-   detector.build_fragments()
+   # detect fragments from stacked files
+   fragments_history = cp.detect_fragment(files)
 
-   for it in range(detector.iterations_nb):
-       detector.plot2D(iteration=it)
+   # stackplot
+   cp.stackplot(fragments_history)
 
-This will generate one 2D image per iteration in your working directory, as well as a 
-stack plot of the area repartition over iterations and a graph of the fragments heredity.
+   # plot fragments at iteration 10
+   cp.plot(fragments_history[9])
+
+After loading files and detect fragments, this will generate a stack plot of the area repartition of each fragment of iteration n°10, 
+as well as one plot of the fragments, colored and labelled.
 
 .. note::
 
-   Make sure the work directory contains valid `.agdd` files, the iteration sorting process is based on filename. For `.agdd` format, see details in the :ref:`usage` section.
+   Make sure the work directory contains valid input files, the iteration sorting process is based on filename.
 
 Preview of Generated Images
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^
@@ -55,7 +59,7 @@ To run it locally, use the following commands:
    cd examples/2D_impact
    python 2D_impact.py
 
-This script will execute the 2D fragmentation detection and save images for each iteration of the simulation in a subfolder ``examples/2D_impact/agdd/img`` of the working directory.
+This script will execute the 2D fragmentation detection.
 
 .. note::
    Make sure you have installed all required dependencies listed in the :ref:`installation` section before running the example.
@@ -63,9 +67,10 @@ This script will execute the 2D fragmentation detection and save images for each
 You can inspect or modify the source code here:
 
 - :file:`examples/2D_impact/2D_impact.py`
-- `.agdd` input files are stored in :file:`examples/2D_impact/agdd/`
+- input files are stored in :file:`examples/2D_impact/files/`
 
-For more details on `.agdd` input file format, see the :ref:`usage` section.
+For more details on input file format, see the :ref:`usage` section.
 
 3D Fragmentation Example
 ------------------------
+Work in progress.
