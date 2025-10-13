@@ -6,6 +6,6 @@ Created on Tue Jul 15 14:17:05 2025
 @author: lbremaud
 """
 
-from .core import Viewer3D, FragmentDetector, Fragment
+from .classes import *
+from .core import *
 
-__all__ = ["Viewer3D", "FragmentDetector", "Fragment"]

@@ -6,26 +6,17 @@ Created on Tue Jul 15 14:26:21 2025
 @author: lbremaud
 """
 
-# =============================================================================
-# LIB
-# =============================================================================
+# import crispy
 import crispy as cp
 
-# =============================================================================
-# MAIN
-# =============================================================================
-# Initialize FragmentDetector and specified .aggd files path
-detector = cp.FragmentDetector("agdd/")
+# load files
+files = cp.load_files("files/", extension="agdd")
 
-# Build fragments
-detector.build_fragments()
+# detect fragments from stacked files
+fragments_history = cp.detect_fragment(files)
 
-# 2D plot at each iteration
-for it in range(detector.iterations_nb):
-    detector.plot2D(iteration=it, save=True, save_format="eps")
+# stackplot
+cp.stackplot(fragments_history, save=False)
 
-# Stack plot: repartition of area
-detector.stackplot()
-
-# Graph: heredity
-detector.graphplot()
+# plot fragments at iteration 10
+cp.plot(fragments_history[9], save=False)
