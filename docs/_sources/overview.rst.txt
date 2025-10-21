@@ -6,22 +6,24 @@ Overview
 About
 -----
 
-**CRISPY** is a Python package for detecting and visualizing fragmentation in discrete simulations.
+**CRISPY** is a Python package for detecting, visualizing and analyzing fragmentation in bonded particle based simulations (SPH, DEM, Peridynamic).
 
 It provides tools to:
-- Read discrete simulation files.
+
+- Read simulation files.
 - Detect connected fragments (2D and 3D).
 - Visualize the evolution of fragments over time.
 - Filter out small trash fragments and manage fragmentation hierarchy.
+- Analyze fragment properties (sphericity, volume, area, ...)
 
 Main Features
 -------------
 
-- 📁 Load simulation data from discrete simulation files.
+- 📁 Load simulation data from bonded particle based simulation files.
 - 🧩 Detect and extract fragments based on node connectivity.
 - 🕸️ Build and analyze the hierarchy of parent-child fragments.
 - 🧼 Automatically discard small trash fragments using a threshold.
-- 📊 Interactive 3D visualization using PyVista.
+- 📊 Interactive 2D/3D visualization using PyVista.
 - 🧪 Easily integrated into analysis pipelines or used as a standalone tool.
 
 Objectives

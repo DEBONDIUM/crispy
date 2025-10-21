@@ -22,7 +22,10 @@ SEED = random.randint(0, 2**32 - 1)
 # =============================================================================
 # GENERAL FUNCTIONS
 # =============================================================================
-def load_files(directory: str, extension: str = "txt") -> list[str]:
+def load_files(
+        directory: str,
+        extension: str = "txt"
+        ) -> list[str]:
     """
     Load files from a specified directory.
 
@@ -38,11 +41,22 @@ def load_files(directory: str, extension: str = "txt") -> list[str]:
     list[str]
         List of files.
     """
-    files = [str(p) for p in Path(directory).glob(f"*{extension}")]
-    files.sort()
+    path = Path(directory)
+    
+    if not path.exists() or not path.is_dir():
+        raise FileNotFoundError(f"The directory '{directory}' does not exist.")
+    
+    files = sorted([str(p) for p in path.glob(f"*{extension}")])
+    
+    if not files:
+        raise ValueError(f"No files with extension '{extension}' found in '{directory}'.")
+    
     return files
     
-def detect_fragment(files: list[str], trash_threshold: int = 10) -> dict[int, list[Fragment]]:
+def detect_fragment(
+        files: list[str],
+        trash_threshold: int = 10
+        ) -> dict[int, list[Fragment]]:
     """
     Compute fragments from a list of files.
 
@@ -58,8 +72,8 @@ def detect_fragment(files: list[str], trash_threshold: int = 10) -> dict[int, li
     dict[int, list[Fragment]]
         Dictionnary of fragments.
     """
-    fragments_history = {}
-    prev_fragments = []
+    fragdict = {}
+    prevfrag = []
     next_id = 0
     
     for it, file in enumerate(files):
@@ -100,7 +114,7 @@ def detect_fragment(files: list[str], trash_threshold: int = 10) -> dict[int, li
             # compute ancestors
             ancestor = []
             n_i = set(n.i for n in n_list)
-            for prev_frag in prev_fragments:
+            for prev_frag in prevfrag:
                 prev_n_i = set(n.i for n in prev_frag._nodes)
                 if len(n_i & prev_n_i) > 0:
                     ancestor.append(prev_frag._i)
@@ -127,12 +141,14 @@ def detect_fragment(files: list[str], trash_threshold: int = 10) -> dict[int, li
             
             fraglist.append(Fragment(frag_id, n_list, b_list, it, ratio, ancestor))
         
-        fragments_history[it] = fraglist
-        prev_fragments = fraglist
+        fragdict[it] = fraglist
+        prevfrag = fraglist
     
-    return fragments_history
+    return fragdict
 
-def get_fragments_by_id(fragments: dict[int, list[Fragment]] | list[Fragment]) -> dict[int, list[Fragment]]:
+def get_fragments_by_id(
+        fragments: dict[int, list[Fragment]] | list[Fragment]
+        ) -> dict[int, list[Fragment]]:
     """
     Return a dictionnary of fragments sorted by id.
 
@@ -163,7 +179,9 @@ def get_fragments_by_id(fragments: dict[int, list[Fragment]] | list[Fragment]) -
                     
     return fragdict
 
-def get_fragments_by_it(fragments: dict[int, list[Fragment]] | list[Fragment]) -> dict[int, list[Fragment]]:
+def get_fragments_by_it(
+        fragments: dict[int, list[Fragment]] | list[Fragment]
+        ) -> dict[int, list[Fragment]]:
     """
     Return a dictionnary of fragments sorted by iteration.
 
@@ -197,7 +215,9 @@ def get_fragments_by_it(fragments: dict[int, list[Fragment]] | list[Fragment]) -
 # =============================================================================
 # INTERNAL HELPERS
 # =============================================================================
-def _read_file(file: str) -> tuple[dict[int, Node], dict[int, Bond]]:
+def _read_file(
+        file: str
+        ) -> tuple[dict[int, Node], dict[int, Bond]]:
     """
     Internal helper to read a file.
 
@@ -229,7 +249,10 @@ def _read_file(file: str) -> tuple[dict[int, Node], dict[int, Bond]]:
     
     return n_all, b_all
 
-def _compute_connectivity(num_n: int, bonds_all: dict[int, Bond]) -> csr_matrix:
+def _compute_connectivity(
+        num_n: int,
+        bonds_all: dict[int, Bond]
+        ) -> csr_matrix:
     """
     Compute a light connectivity matrix.
 
@@ -251,8 +274,10 @@ def _compute_connectivity(num_n: int, bonds_all: dict[int, Bond]) -> csr_matrix:
         connectivity[bond.n2.i, bond.n1.i] = 1
     return connectivity.tocsr()
 
-
-def _random_color_id(i: int, seed: int = SEED) -> tuple[float]:
+def _random_color_id(
+        i: int,
+        seed: int = SEED
+        ) -> tuple[float]:
     """
     Generate a random color within a colormap randomly initialized.
 
@@ -275,18 +300,20 @@ def _random_color_id(i: int, seed: int = SEED) -> tuple[float]:
 # =============================================================================
 # VISUALIZATION TOOLKIT
 # =============================================================================
-def plot(fraglist: list[Fragment], 
-           title: str = "",
-           xlim: list[int] | None = None,
-           ylim: list[int] | None = None,
-           zlim: list[int] | None = None,
-           show_node: bool = True,
-           show_bond: bool = True,
-           show_axe: bool = False,
-           auto_close: bool = False,
-           save: bool = True,
-           filename: str = "plot",
-           save_dir: str = os.path.join(os.getcwd(), "img")) -> None:
+def pvplot(
+        fraglist: list[Fragment], 
+        xlim: list[int] | None = None,
+        ylim: list[int] | None = None,
+        zlim: list[int] | None = None,
+        show_node: bool = True,
+        show_bond: bool = True,
+        show_axe: bool = False,
+        auto_close: bool = False,
+        camera_position: list[tuple] | None = None,
+        save: bool = True,
+        filename: str = "plot",
+        save_dir: str = os.path.join(os.getcwd(), "img")
+        ) -> None:
     """
     Plot fragments.
 
@@ -294,8 +321,6 @@ def plot(fraglist: list[Fragment],
     ----------
     fraglist : list[Fragment]
         List of Fragment objects.
-    title : str, optional
-        Plot title. The default is "".
     xlim : list[int] | None, optional
         Set plot x-limits. The default is None.
     ylim : list[int] | None, optional
@@ -310,14 +335,16 @@ def plot(fraglist: list[Fragment],
         Show axes. The default is False.
     auto_close : bool, optional
         Automatically close window plot. The default is False.
+    camera_position : list[tuple] | None, optional
+        Set the camera position (see https://docs.pyvista.org/api/plotting/_autosummary/pyvista.cameraposition#pyvista.CameraPosition). The default is 'xy'.
     save : bool, optional
         Save option. The default is True.
     filename : str
         Filename of saved image.
     save_dir : str, optional
-        Save directory. The default is os.path.join(os.getcwd(), "img").
+        Save directory. The default is "/img" in current directory.
     """
-    plotter = pv.Plotter(title=title, off_screen=auto_close)
+    plotter = pv.Plotter(off_screen=auto_close)
     
     for frag in fraglist:
         # fragment color
@@ -374,35 +401,34 @@ def plot(fraglist: list[Fragment],
             font_size = 10,
             fmt=auto_tick_format(np.max([xmax - xmin, ymax - ymin, zmax - zmin])))
     
-    plotter.camera_position = [
-        (0, 0, 10),   # camera location (x, y, z)
-        (0, 0, 0),    # focal point (center of view)
-        (0, 1, 0)     # up vector (keeps Y upward)
-    ]
-    
-    plotter.show(cpos='xy')
+    if camera_position == None:
+        plotter.camera_position = 'xy'
+    else:
+        plotter.camera_position = camera_position
+        
+    plotter.show()
     
     if save:
-        os.makedirs(save_dir, exist_ok = True)
-        plotter.screenshot(os.path.join(save_dir, filename))
+        filepath = os.path.join(save_dir, filename)
+        plotter.screenshot(filepath)
+        print(f"Plot saved to {filepath}")
     
-def stackplot(fragments: dict[int, list[Fragment]] | list[Fragment], 
-           title: str = "",
-           xgrid: bool = True,
-           contour: bool = True,
-           auto_close: bool = False,
-           save: bool = True,
-           filename: str = "stackplot", 
-           save_dir: str = os.path.join(os.getcwd(), "img")) -> None:
+def stackplot(
+        fraglist: list[Fragment], 
+        xgrid: bool = True,
+        contour: bool = True,
+        auto_close: bool = False,
+        save: bool = True,
+        filename: str = "stackplot", 
+        save_dir: str = os.path.join(os.getcwd(), "img")
+        ) -> None:
     """
     Stackplot of the evolution of the fragment repartition.
 
     Parameters
     ----------
-    fragments : dict[int, list[Fragment]] | list[Fragment]
-        Fragment objetcs.
-    title : str, optional
-        Figure title. The default is "".
+    fragments : list[Fragment]
+        Fragment list.
     xgrid : bool, optional
         Show iteration separator. The default is True.
     contour : bool, optional
@@ -414,14 +440,13 @@ def stackplot(fragments: dict[int, list[Fragment]] | list[Fragment],
     filename : str
         Filename of saved image.
     save_dir : str, optional
-        Save directory. The default is os.path.join(os.getcwd(), "img").
+        Save directory. The default is "/img" in current directory.
     """
-    if isinstance(fragments, dict):
-        fraglist = [f for flist in fragments.values() for f in flist]
-    elif isinstance(fragments, list):
-        fraglist = fragments.copy()
-    else:
-        raise TypeError("The fragments must be a dictionnary or a list of Fragment objects")
+    if len(fraglist) == 0:
+        raise ValueError("The fragment list is empty")
+    
+    if not all(isinstance(f, Fragment) for f in fraglist):
+        raise TypeError("The fragment list must contain Fragment objects")
     
     # get iterations and indices
     ids = sorted(get_fragments_by_id(fraglist).keys())
@@ -430,11 +455,13 @@ def stackplot(fragments: dict[int, list[Fragment]] | list[Fragment],
     # data matrix
     data = np.zeros((len(ids), len(its)))
     id_to_row = {fid: i for i, fid in enumerate(ids)}
+    it_to_col = {fit: it for it, fit in enumerate(its)}
 
     for f in fraglist:
-        if f.i in id_to_row:
+        if f.i in id_to_row and f.it in it_to_col:
             row = id_to_row[f.i]
-            data[row, f.it] = f.ratio
+            col = it_to_col[f.it]
+            data[row, col] = f.ratio
     cumulative_data = np.cumsum(data, axis=0)
     
     # colors
@@ -452,17 +479,209 @@ def stackplot(fragments: dict[int, list[Fragment]] | list[Fragment],
     ax.set_ylim(0, 100)
     ax.set_xlabel("Iteration", fontsize=10)
     ax.set_ylabel("Repartition \ %", fontsize=10)
-    fig.title = title
     plt.tight_layout()
     
     if save:
-        os.makedirs(save_dir, exist_ok = True)
-        plt.savefig(os.path.join(save_dir, filename))
+        os.makedirs(save_dir, exist_ok=True)
+        filepath = os.path.join(save_dir, filename)
+        plt.savefig(filepath)
+        print(f"Plot saved to {filepath}")
     
     if auto_close:
         plt.close(fig)
     else:
         plt.show()
+
+def histplot(
+        fraglist: list[Fragment], 
+        auto_close: bool = False,
+        save: bool = True,
+        filename: str = "histplot", 
+        save_dir: str = os.path.join(os.getcwd(), "img")
+        ) -> None:
+    """
+    Plot of the distribution of the fragment properties.
+
+    Parameters
+    ----------
+    fragments : list[Fragment]
+        Fragments list.
+    auto_close : bool, optional
+        Automatically close window plot. The default is False.
+    save : bool, optional
+        Save option. The default is True.
+    filename : str
+        Filename of saved image.
+    save_dir : str, optional
+        Save directory. The default is "/img" in current directory.
+    """
+    if len(fraglist) == 0:
+        raise ValueError("The fragment list is empty")
+    
+    if not all(isinstance(f, Fragment) for f in fraglist):
+        raise TypeError("The fragment list must contain Fragment objects")
+        
+    if not all(f.dim in (2, 3) for f in fraglist):
+        raise ValueError("The fragments must have the same dimension")
+    
+    # get indices
+    ids = sorted(get_fragments_by_id(fraglist).keys())
+
+    # data matrix
+    data = np.zeros((len(ids), 6))
+    id_to_row = {fid: i for i, fid in enumerate(ids)}
+
+    for f in fraglist:
+        if f.i in id_to_row:
+            row = id_to_row[f.i]
+            data[row, 0] = len(f.nodes)
+            data[row, 1] = len(f.bonds)
+            data[row, 2] = f.ratio
+            data[row, 3] = f.sphericity
+            data[row, 4] = f.area
+            data[row, 5] = f.volume if f.dim == 3 else f.perimeter
+    
+    fig, axs = plt.subplots(2, 3, figsize=(10, 8))
+    
+    # nodes
+    counts, bins, patches = axs[0, 0].hist(data[:, 0], bins='auto')
+    axs[0, 0].clear()
+    axs[0, 0].bar(bins[:-1], counts / counts.sum() * 100, width=np.diff(bins), color='C0', edgecolor='black', alpha=0.7)
+    axs[0, 0].set_xlabel("Num. of nodes")
+    axs[0, 0].set_ylabel("Frag. percentage \ %")
+    
+    # bonds
+    counts, bins, patches = axs[0, 1].hist(data[:, 1], bins='auto')
+    axs[0, 1].clear()
+    axs[0, 1].bar(bins[:-1], counts / counts.sum() * 100, width=np.diff(bins), color='C1', edgecolor='black', alpha=0.7)
+    axs[0, 1].set_xlabel("Num. of bonds")
+    axs[0, 1].set_ylabel("Frag. percentage \ %")
+    
+    # ratio
+    counts, bins, patches = axs[0, 2].hist(data[:, 2], bins='auto')
+    axs[0, 2].clear()
+    axs[0, 2].bar(bins[:-1], counts / counts.sum() * 100, width=np.diff(bins), color='C2', edgecolor='black', alpha=0.7)
+    axs[0, 2].set_xlabel("Space ratio \ %")
+    axs[0, 2].set_ylabel("Frag. percentage \ %")
+    
+    # sphericity
+    counts, bins, patches = axs[1, 0].hist(data[:, 3], bins='auto')
+    axs[1, 0].clear()
+    axs[1, 0].bar(bins[:-1], counts / counts.sum() * 100, width=np.diff(bins), color='C3', edgecolor='black', alpha=0.7)
+    axs[1, 0].set_xlabel("Sphericity")
+    axs[1, 0].set_ylabel("Frag. percentage \ %")
+    
+    # area
+    counts, bins, patches = axs[1, 1].hist(data[:, 4], bins='auto')
+    axs[1, 1].clear()
+    axs[1, 1].bar(bins[:-1], counts / counts.sum() * 100, width=np.diff(bins), color='C4', edgecolor='black', alpha=0.7)
+    axs[1, 1].set_xlabel("Area \ $m^2$")
+    axs[1, 1].set_ylabel("Frag. percentage \ %")
+    
+    # volume / perimeter
+    counts, bins, patches = axs[1, 2].hist(data[:, 5], bins='auto')
+    axs[1, 2].clear()
+    axs[1, 2].bar(bins[:-1], counts / counts.sum() * 100, width=np.diff(bins), color='C5', edgecolor='black', alpha=0.7)
+    axs[1, 2].set_xlabel("Volume \ $m^3$") if f.dim == 3 else axs[1, 2].set_xlabel("Perimeter \ m")
+    axs[1, 2].set_ylabel("Frag. percentage \ %")
+    
+    plt.tight_layout()
+    plt.show()
+
+    if save:
+        os.makedirs(save_dir, exist_ok=True)
+        filepath = os.path.join(save_dir, filename)
+        plt.savefig(filepath)
+        print(f"Plot saved to {filepath}")
+    
+    if auto_close:
+        plt.close(fig)
+    else:
+        plt.show()
+
+def stats(
+        fraglist: list[Fragment], 
+        save: bool = True,
+        filename: str = "stats", 
+        save_dir: str = os.path.join(os.getcwd())
+        ) -> None:
+    """
+    Retun the statistics of the fragment list.
+    
+    Parameters
+    ----------
+    fragments : list[Fragment]
+        Fragments list.
+    save : bool, optional
+        Save option. The default is True.
+    filename : str
+        Filename of saved stats.
+    save_dir : str, optional
+        Save directory. The default is the current directory.
+    """
+    if len(fraglist) == 0:
+        raise ValueError("The fragment list is empty")
+    
+    if not all(isinstance(f, Fragment) for f in fraglist):
+        raise TypeError("The fragment list must contain Fragment objects")
+    
+    if not all(f.dim in (2, 3) for f in fraglist):
+        raise ValueError("The fragments must have the same dimension")
+    
+    # get indices
+    ids = sorted(get_fragments_by_id(fraglist).keys())
+    
+    # data matrix
+    data = np.zeros((len(ids), 6))
+    id_to_row = {fid: i for i, fid in enumerate(ids)}
+    
+    for f in fraglist:
+        if f.i in id_to_row:
+            row = id_to_row[f.i]
+            data[row, 0] = len(f.nodes)
+            data[row, 1] = len(f.bonds)
+            data[row, 2] = f.ratio
+            data[row, 3] = f.sphericity
+            data[row, 4] = f.area
+            data[row, 5] = f.volume if f.dim == 3 else f.perimeter
+    
+    # property names
+    prop_names = ["Num. of nodes", "Num. of bonds", "Space ratio", 
+                  "Sphericity", "Area"]
+    prop_names += ["Perimeter" if f.dim == 2 else "Volume"]
+    
+    # compute statistics
+    stats_dict = {}
+    for i, name in enumerate(prop_names):
+        vals = data[:, i]
+        stats_dict[name] = {
+            "mean": np.mean(vals),
+            "median": np.median(vals),
+            "min": np.min(vals),
+            "max": np.max(vals),
+            "std": np.std(vals)
+        }
+    
+    # print stats
+    for name, s in stats_dict.items():
+        print(f"--- {name} ---")
+        for k, v in s.items():
+            print(f"{k.capitalize():>6}: {v:.4f}")
+        print()
+    
+    # save to file if requested
+    if save:
+        os.makedirs(save_dir, exist_ok=True)
+        if not filename.lower().endswith(".txt"):
+            filename += ".txt"
+        filepath = os.path.join(save_dir, filename)
+        with open(filepath, "w") as f:
+            for name, s in stats_dict.items():
+                f.write(f"--- {name} ---\n")
+                for k, v in s.items():
+                    f.write(f"{k.capitalize():>6}: {v:.4f}\n")
+                f.write("\n")
+        print(f"Statistics saved to {filepath}")
             
 # =============================================================================
 # DEBUGGING

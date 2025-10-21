@@ -33,7 +33,7 @@
           
           <a href="index.html" class="icon icon-home">
             CRISPY
-              <img src="_static/logo_crispy.png" class="logo" alt="Logo"/>
+              <img src="_static/logo.png" class="logo" alt="Logo"/>
           </a>
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
@@ -50,13 +50,18 @@
 <li class="toctree-l1"><a class="reference internal" href="usage.html">Quick Start</a></li>
 <li class="toctree-l1"><a class="reference internal" href="api.html">API Reference</a></li>
 <li class="toctree-l1 current"><a class="current reference internal" href="#">Examples</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="#d-fragmentation-example">2D Fragmentation Example</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#d-3d-fragmentation-example">2D/3D Fragmentation Example</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="#code-example">Code Example</a></li>
 <li class="toctree-l3"><a class="reference internal" href="#preview-of-generated-images">Preview of Generated Images</a></li>
 <li class="toctree-l3"><a class="reference internal" href="#run-the-example">Run the Example</a></li>
 </ul>
 </li>
-<li class="toctree-l2"><a class="reference internal" href="#id2">3D Fragmentation Example</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#fragment-analysis">Fragment Analysis</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#stackplot">Stackplot</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#histograms">Histograms</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#statistics">Statistics</a></li>
+</ul>
+</li>
 </ul>
 </li>
 </ul>
@@ -87,26 +92,22 @@
              
   <section id="examples">
 <span id="id1"></span><h1>Examples<a class="headerlink" href="#examples" title="Link to this heading"></a></h1>
-<section id="d-fragmentation-example">
-<h2>2D Fragmentation Example<a class="headerlink" href="#d-fragmentation-example" title="Link to this heading"></a></h2>
-<p>This example demonstrates how to use <strong>Crispy</strong> to load a set of files obtained from a <a class="reference external" href="https://www.granoo.org/">GranOO</a> simulation of 2D disc impact and visualize fragmentation over time.</p>
+<section id="d-3d-fragmentation-example">
+<h2>2D/3D Fragmentation Example<a class="headerlink" href="#d-3d-fragmentation-example" title="Link to this heading"></a></h2>
+<p>This example demonstrates how to use <strong>Crispy</strong> to load a set of files obtained from a bonded particle based simulation and visualize fragmentation over time.</p>
 <section id="code-example">
 <h3>Code Example<a class="headerlink" href="#code-example" title="Link to this heading"></a></h3>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># load files</span>
 <span class="n">files</span> <span class="o">=</span> <span class="n">cp</span><span class="o">.</span><span class="n">load_files</span><span class="p">(</span><span class="s2">&quot;files/&quot;</span><span class="p">,</span> <span class="n">extension</span><span class="o">=</span><span class="s2">&quot;agdd&quot;</span><span class="p">)</span>
 
 <span class="c1"># detect fragments from stacked files</span>
-<span class="n">fragments_history</span> <span class="o">=</span> <span class="n">cp</span><span class="o">.</span><span class="n">detect_fragment</span><span class="p">(</span><span class="n">files</span><span class="p">)</span>
-
-<span class="c1"># stackplot</span>
-<span class="n">cp</span><span class="o">.</span><span class="n">stackplot</span><span class="p">(</span><span class="n">fragments_history</span><span class="p">)</span>
+<span class="n">frag_dict</span> <span class="o">=</span> <span class="n">cp</span><span class="o">.</span><span class="n">detect_fragment</span><span class="p">(</span><span class="n">files</span><span class="p">)</span>
 
 <span class="c1"># plot fragments at iteration 10</span>
-<span class="n">cp</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">fragments_history</span><span class="p">[</span><span class="mi">9</span><span class="p">])</span>
+<span class="n">cp</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">frag_dict</span><span class="p">[</span><span class="mi">9</span><span class="p">])</span>
 </pre></div>
 </div>
-<p>After loading files and detect fragments, this will generate a stack plot of the area repartition of each fragment of iteration n°10,
-as well as one plot of the fragments, colored and labelled.</p>
+<p>After loading files and detect fragments, this will generate one plot of the fragments, colored and labelled.</p>
 <div class="admonition note">
 <p class="admonition-title">Note</p>
 <p>Make sure the work directory contains valid input files, the iteration sorting process is based on filename.</p>
@@ -114,11 +115,9 @@ as well as one plot of the fragments, colored and labelled.</p>
 </section>
 <section id="preview-of-generated-images">
 <h3>Preview of Generated Images<a class="headerlink" href="#preview-of-generated-images" title="Link to this heading"></a></h3>
-<a class="reference internal image-reference" href="_images/plot2D_iteration0.png"><img alt="Fragments at iteration 0" src="_images/plot2D_iteration0.png" style="width: 200px;" />
+<a class="reference internal image-reference" href="_images/plot2D_it50.png"><img alt="Fragments at iteration 50" src="_images/plot2D_it50.png" style="width: 50%;" />
 </a>
-<a class="reference internal image-reference" href="_images/plot2D_iteration5.png"><img alt="Fragments at iteration 5" src="_images/plot2D_iteration5.png" style="width: 200px;" />
-</a>
-<a class="reference internal image-reference" href="_images/plot2D_iteration10.png"><img alt="Fragments at iteration 10" src="_images/plot2D_iteration10.png" style="width: 200px;" />
+<a class="reference internal image-reference" href="_images/plot3D_it50.png"><img alt="Fragments at iteration 50" src="_images/plot3D_it50.png" style="width: 50%;" />
 </a>
 </section>
 <section id="run-the-example">
@@ -129,7 +128,7 @@ as well as one plot of the fragments, colored and labelled.</p>
 python<span class="w"> </span>2D_impact.py
 </pre></div>
 </div>
-<p>This script will execute the 2D fragmentation detection.</p>
+<p>This script will execute the 2D fragmentation detection of a disc impact.</p>
 <div class="admonition note">
 <p class="admonition-title">Note</p>
 <p>Make sure you have installed all required dependencies listed in the <a class="reference internal" href="installation.html#installation"><span class="std std-ref">Installation</span></a> section before running the example.</p>
@@ -140,11 +139,105 @@ python<span class="w"> </span>2D_impact.py
 <li><p>input files are stored in <code class="file docutils literal notranslate"><span class="pre">examples/2D_impact/files/</span></code></p></li>
 </ul>
 <p>For more details on input file format, see the <a class="reference internal" href="usage.html#usage"><span class="std std-ref">Quick Start</span></a> section.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>A full 3D example of a hollow sphere impact is also available inside the <code class="docutils literal notranslate"><span class="pre">examples/3D_impact</span></code> folder.</p>
+</div>
 </section>
 </section>
-<section id="id2">
-<h2>3D Fragmentation Example<a class="headerlink" href="#id2" title="Link to this heading"></a></h2>
-<p>Work in progress.</p>
+<section id="fragment-analysis">
+<h2>Fragment Analysis<a class="headerlink" href="#fragment-analysis" title="Link to this heading"></a></h2>
+<p><strong>Crispy</strong> also allows to make classic analysis of fragments through several tools.</p>
+<section id="stackplot">
+<h3>Stackplot<a class="headerlink" href="#stackplot" title="Link to this heading"></a></h3>
+<p>This function shows the evolution of the space ratio taken by each fragment over iterations.</p>
+<p>To run it locally, use the following commands:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># load files</span>
+<span class="n">files</span> <span class="o">=</span> <span class="n">cp</span><span class="o">.</span><span class="n">load_files</span><span class="p">(</span><span class="s2">&quot;files/&quot;</span><span class="p">,</span> <span class="n">extension</span><span class="o">=</span><span class="s2">&quot;agdd&quot;</span><span class="p">)</span>
+
+<span class="c1"># detect fragments from stacked files</span>
+<span class="n">frag_dict</span> <span class="o">=</span> <span class="n">cp</span><span class="o">.</span><span class="n">detect_fragment</span><span class="p">(</span><span class="n">files</span><span class="p">)</span>
+
+<span class="c1"># stackplot of the fragments over iterations</span>
+<span class="n">cp</span><span class="o">.</span><span class="n">stackplot</span><span class="p">([</span><span class="n">f</span> <span class="k">for</span> <span class="n">fgroup</span> <span class="ow">in</span> <span class="n">frag_dict</span><span class="o">.</span><span class="n">values</span><span class="p">()</span> <span class="k">for</span> <span class="n">f</span> <span class="ow">in</span> <span class="n">fgroup</span><span class="p">])</span>
+</pre></div>
+</div>
+<a class="reference internal image-reference" href="_images/stackplot.png"><img alt="Stackplot 2D" src="_images/stackplot.png" style="width: 100%;" />
+</a>
+</section>
+<section id="histograms">
+<h3>Histograms<a class="headerlink" href="#histograms" title="Link to this heading"></a></h3>
+<p>Several properties can be visualized on histograms, such as the bonds/nodes repatition, the volume, area, sphericity distribution, using:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># load files</span>
+<span class="n">files</span> <span class="o">=</span> <span class="n">cp</span><span class="o">.</span><span class="n">load_files</span><span class="p">(</span><span class="s2">&quot;files/&quot;</span><span class="p">,</span> <span class="n">extension</span><span class="o">=</span><span class="s2">&quot;agdd&quot;</span><span class="p">)</span>
+
+<span class="c1"># detect fragments from stacked files</span>
+<span class="n">frag_dict</span> <span class="o">=</span> <span class="n">cp</span><span class="o">.</span><span class="n">detect_fragment</span><span class="p">(</span><span class="n">files</span><span class="p">)</span>
+
+<span class="c1"># statistic histogram of fragments at iteration n°50</span>
+<span class="n">cp</span><span class="o">.</span><span class="n">histplot</span><span class="p">(</span><span class="n">frag_dict</span><span class="p">[</span><span class="mi">49</span><span class="p">])</span>
+</pre></div>
+</div>
+<a class="reference internal image-reference" href="_images/histplot.png"><img alt="Histograms 2D" src="_images/histplot.png" style="width: 100%;" />
+</a>
+</section>
+<section id="statistics">
+<h3>Statistics<a class="headerlink" href="#statistics" title="Link to this heading"></a></h3>
+<p>Finally, the statistics of one iteration can be stored and saved in a <code class="docutils literal notranslate"><span class="pre">.txt</span></code> file. The stats will also be printed on terminal:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># load files</span>
+<span class="n">files</span> <span class="o">=</span> <span class="n">cp</span><span class="o">.</span><span class="n">load_files</span><span class="p">(</span><span class="s2">&quot;files/&quot;</span><span class="p">,</span> <span class="n">extension</span><span class="o">=</span><span class="s2">&quot;agdd&quot;</span><span class="p">)</span>
+
+<span class="c1"># detect fragments from stacked files</span>
+<span class="n">frag_dict</span> <span class="o">=</span> <span class="n">cp</span><span class="o">.</span><span class="n">detect_fragment</span><span class="p">(</span><span class="n">files</span><span class="p">)</span>
+
+<span class="c1"># statistics of fragments at iteration n°50</span>
+<span class="n">cp</span><span class="o">.</span><span class="n">stats</span><span class="p">(</span><span class="n">frag_dict</span><span class="p">[</span><span class="mi">49</span><span class="p">])</span>
+</pre></div>
+</div>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>---<span class="w"> </span>Num.<span class="w"> </span>of<span class="w"> </span>nodes<span class="w"> </span>---
+Mean:<span class="w"> </span><span class="m">603</span>.8000
+Median:<span class="w"> </span><span class="m">149</span>.0000
+Min:<span class="w"> </span><span class="m">11</span>.0000
+Max:<span class="w"> </span><span class="m">2532</span>.0000
+Std:<span class="w"> </span><span class="m">818</span>.6880
+
+---<span class="w"> </span>Num.<span class="w"> </span>of<span class="w"> </span>bonds<span class="w"> </span>---
+Mean:<span class="w"> </span><span class="m">981</span>.6000
+Median:<span class="w"> </span><span class="m">115</span>.0000
+Min:<span class="w"> </span><span class="m">19</span>.0000
+Max:<span class="w"> </span><span class="m">4727</span>.0000
+Std:<span class="w"> </span><span class="m">1470</span>.1197
+
+---<span class="w"> </span>Space<span class="w"> </span>ratio<span class="w"> </span>---
+Mean:<span class="w"> </span><span class="m">10</span>.0000
+Median:<span class="w"> </span><span class="m">2</span>.4677
+Min:<span class="w"> </span><span class="m">0</span>.1822
+Max:<span class="w"> </span><span class="m">41</span>.9344
+Std:<span class="w"> </span><span class="m">13</span>.5589
+
+---<span class="w"> </span>Sphericity<span class="w"> </span>---
+Mean:<span class="w"> </span><span class="m">0</span>.8024
+Median:<span class="w"> </span><span class="m">0</span>.8321
+Min:<span class="w"> </span><span class="m">0</span>.6421
+Max:<span class="w"> </span><span class="m">0</span>.9139
+Std:<span class="w"> </span><span class="m">0</span>.0865
+
+---<span class="w"> </span>Area<span class="w"> </span>---
+Mean:<span class="w"> </span><span class="m">0</span>.0004
+Median:<span class="w"> </span><span class="m">0</span>.0000
+Min:<span class="w"> </span><span class="m">0</span>.0000
+Max:<span class="w"> </span><span class="m">0</span>.0030
+Std:<span class="w"> </span><span class="m">0</span>.0009
+
+---<span class="w"> </span>Perimeter<span class="w"> </span>---
+Mean:<span class="w"> </span><span class="m">0</span>.0532
+Median:<span class="w"> </span><span class="m">0</span>.0224
+Min:<span class="w"> </span><span class="m">0</span>.0062
+Max:<span class="w"> </span><span class="m">0</span>.2442
+Std:<span class="w"> </span><span class="m">0</span>.0696
+</pre></div>
+</div>
+</section>
 </section>
 </section>
 

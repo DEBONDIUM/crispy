@@ -34,7 +34,7 @@
           
           <a href="index.html" class="icon icon-home">
             CRISPY
-              <img src="_static/logo_crispy.png" class="logo" alt="Logo"/>
+              <img src="_static/logo.png" class="logo" alt="Logo"/>
           </a>
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
@@ -90,17 +90,17 @@
 </pre></div>
 </div>
 <p>Then load input files from a specified directory:</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">files</span> <span class="o">=</span> <span class="n">cp</span><span class="o">.</span><span class="n">load_files</span><span class="p">(</span><span class="s2">&quot;input_files/&quot;</span><span class="p">)</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">files</span> <span class="o">=</span> <span class="n">cp</span><span class="o">.</span><span class="n">load_files</span><span class="p">(</span><span class="s2">&quot;files/&quot;</span><span class="p">)</span>
 </pre></div>
 </div>
 <p>Then launch the fragment detection:</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">fragments_history</span> <span class="o">=</span> <span class="n">cp</span><span class="o">.</span><span class="n">detect_fragment</span><span class="p">(</span><span class="n">files</span><span class="p">)</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">frag_dict</span> <span class="o">=</span> <span class="n">cp</span><span class="o">.</span><span class="n">detect_fragment</span><span class="p">(</span><span class="n">files</span><span class="p">)</span>
 </pre></div>
 </div>
 </section>
 <section id="input-file-format">
 <h2>Input File Format<a class="headerlink" href="#input-file-format" title="Link to this heading"></a></h2>
-<p>Crispy operates on all type of files, as long as they contain structured data describing discrete domain properties such as nodes and bonds.</p>
+<p>Crispy operates on all type of files, as long as they contain structured data describing bonded particle based domain properties such as nodes and bonds.</p>
 <p>A typical input file should be structured like this:</p>
 <div class="highlight-text notranslate"><div class="highlight"><pre><span></span># Example input file
 1000 # Number of nodes (Pos X / Pos Y / Pos Z)

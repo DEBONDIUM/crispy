@@ -34,7 +34,7 @@
           
           <a href="index.html" class="icon icon-home">
             CRISPY
-              <img src="_static/logo_crispy.png" class="logo" alt="Logo"/>
+              <img src="_static/logo.png" class="logo" alt="Logo"/>
           </a>
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
@@ -86,21 +86,24 @@
 <span id="id1"></span><h1>Overview<a class="headerlink" href="#overview" title="Link to this heading"></a></h1>
 <section id="about">
 <h2>About<a class="headerlink" href="#about" title="Link to this heading"></a></h2>
-<p><strong>CRISPY</strong> is a Python package for detecting and visualizing fragmentation in discrete simulations.</p>
-<p>It provides tools to:
-- Read discrete simulation files.
-- Detect connected fragments (2D and 3D).
-- Visualize the evolution of fragments over time.
-- Filter out small trash fragments and manage fragmentation hierarchy.</p>
+<p><strong>CRISPY</strong> is a Python package for detecting, visualizing and analyzing fragmentation in bonded particle based simulations (SPH, DEM, Peridynamic).</p>
+<p>It provides tools to:</p>
+<ul class="simple">
+<li><p>Read simulation files.</p></li>
+<li><p>Detect connected fragments (2D and 3D).</p></li>
+<li><p>Visualize the evolution of fragments over time.</p></li>
+<li><p>Filter out small trash fragments and manage fragmentation hierarchy.</p></li>
+<li><p>Analyze fragment properties (sphericity, volume, area, …)</p></li>
+</ul>
 </section>
 <section id="main-features">
 <h2>Main Features<a class="headerlink" href="#main-features" title="Link to this heading"></a></h2>
 <ul class="simple">
-<li><p>📁 Load simulation data from discrete simulation files.</p></li>
+<li><p>📁 Load simulation data from bonded particle based simulation files.</p></li>
 <li><p>🧩 Detect and extract fragments based on node connectivity.</p></li>
 <li><p>🕸️ Build and analyze the hierarchy of parent-child fragments.</p></li>
 <li><p>🧼 Automatically discard small trash fragments using a threshold.</p></li>
-<li><p>📊 Interactive 3D visualization using PyVista.</p></li>
+<li><p>📊 Interactive 2D/3D visualization using PyVista.</p></li>
 <li><p>🧪 Easily integrated into analysis pipelines or used as a standalone tool.</p></li>
 </ul>
 </section>

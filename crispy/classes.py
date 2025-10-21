@@ -10,6 +10,7 @@ Created on Tue Oct  7 14:57:21 2025
 # LIB
 # =============================================================================
 import numpy as np
+from scipy.spatial import ConvexHull
 
 # =============================================================================
 # CLASS NODE
@@ -72,6 +73,33 @@ class Fragment:
         self._it = int(it)
         self._ratio = float(ratio)
         self._ancestor = ancestor
+        
+        tol = 1e-8
+        xyz = np.array([(n.x, n.y, n.z) for n in self._nodes])
+        dim_mask = np.ptp(xyz, axis=0) > tol
+        pts = xyz[:, dim_mask]
+
+        cx, cy, cz = xyz.mean(axis = 0)
+        self._centroid = Node(-1, cx, cy, cz)
+        
+        self._dim = np.sum(dim_mask)
+        if self._dim == 3:
+            hull = ConvexHull(pts)
+            self._volume = hull.volume
+            self._area = hull.area
+            self._perimeter = np.nan
+            self._sphericity = (np.pi ** (1/3) * (6 * self._volume) ** (2/3)) / self._area
+        elif self._dim == 2:
+            hull = ConvexHull(pts)
+            self._volume = np.nan
+            self._area = hull.volume
+            self._perimeter = hull.area
+            self._sphericity = 4 * np.pi * self._area / (self._perimeter ** 2)
+        else:
+            self._volume = np.nan
+            self._area = np.nan
+            self._perimeter = np.nan
+            self._sphericity = np.nan
     
     # ---- Properties ----
     @property
@@ -99,10 +127,28 @@ class Fragment:
         return self._ancestor
     
     @property
+    def dim(self) -> int:
+        return self._dim
+    
+    @property
+    def volume(self) -> float:
+        return self._volume
+    
+    @property
+    def area(self) -> float:
+        return self._area
+    
+    @property
+    def perimeter(self) -> float:
+        return self._perimeter
+    
+    @property
+    def sphericity(self) -> float:
+        return self._sphericity
+    
+    @property
     def centroid(self) -> Node:
-        xyz = np.array([(n.x, n.y, n.z) for n in self._nodes])
-        cx, cy, cz = xyz.mean(axis = 0)
-        return Node(-1, cx, cy, cz)
+        return self._centroid
 
 
 

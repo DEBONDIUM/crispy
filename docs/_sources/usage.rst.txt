@@ -16,18 +16,18 @@ Then load input files from a specified directory:
 
 .. code-block:: python
 
-   files = cp.load_files("input_files/")
+   files = cp.load_files("files/")
 
 Then launch the fragment detection:
 
 .. code-block:: python
 
-   fragments_history = cp.detect_fragment(files)
+   frag_dict = cp.detect_fragment(files)
 
 Input File Format
 -----------------
 
-Crispy operates on all type of files, as long as they contain structured data describing discrete domain properties such as nodes and bonds.
+Crispy operates on all type of files, as long as they contain structured data describing bonded particle based domain properties such as nodes and bonds.
 
 A typical input file should be structured like this:
 

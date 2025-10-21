@@ -16,7 +16,7 @@ author = 'L. Brémaud, J. Girardot'
 release = '0.2.0'
 version = '0.2'
 
-html_logo = "_static/logo_crispy.png"
+html_logo = "_static/logo.png"
 #html_favicon = "_static/favicon.ico"
 
 # -- General configuration ---------------------------------------------------
@@ -62,6 +62,7 @@ pygments_style = 'sphinx'  # Options: 'default', 'sphinx', 'friendly', 'monokai'
 intersphinx_mapping = {
     'python': ('https://docs.python.org/3', None),
     'numpy': ('https://numpy.org/doc/stable/', None),
+    'pyvista': ('https://pyvista.org/', None),
 }
 
 
