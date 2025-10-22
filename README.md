@@ -1,7 +1,7 @@
 # Crispy
 # 🧩 Crispy – Fragments Analysis in Solid Mechanics
 
-**Crispy** is a lightweight Python library designed to **identify, count, and analyze fragments** generated in **particule-based simulations**. Whether you're working on dynamic fracture, debris tracking, or material fragmentation, `crispy` provides simple and robust tools to extract meaningful metrics from your numerical data.
+**Crispy** is a lightweight Python library designed to **identify, count, and analyze fragments** generated in **bonded particule based simulations**. Whether you're working on dynamic fracture, debris tracking, or material fragmentation, `crispy` provides simple and robust tools to extract meaningful metrics from your numerical data.
 
 > 💥 From breakage to data — fast, clear, and **crispy**.
 
@@ -41,11 +41,9 @@ import crispy as cp
 
 files = cp.load_files("files/", extension="agdd")
 
-fragments_history = cp.detect_fragment(files)
+frag_dict = cp.detect_fragment(files)
 
-cp.stackplot(fragments_history)
-
-cp.plot(fragments_history[9])
+cp.pvplot(frag_dict[9])
 ```
 
 More examples are available in the [`examples/`](examples/) folder and in the [documentation](https://debondium.github.io/crispy).
@@ -64,7 +62,7 @@ The full documentation (installation, API reference, usage examples) is availabl
 - Fracture mechanics  
 - Impact simulations  
 - Granular material studies  
-- Discrete Element Method (DEM) post-processing  
+- Bonded particle based simulation (DEM, SPH, Peridynamic) post-processing  
 - Crack propagation analysis  
 
 ---
@@ -96,4 +94,3 @@ MIT License — see [LICENSE](LICENSE) for details.
 This library is developed for researchers and engineers working in **solid mechanics**, **computational physics**, and **fracture modeling**.  
 If you use `crispy` in your work, please consider citing it or linking to the repository.
 
-> _“In the breaking of things lies the story of how they were made.”_
